@@ -45,6 +45,7 @@ plugin.xml_gen
 src-gen
 xtend-gen
 
+.cache
 .cache/
 .history/
 .lib/
