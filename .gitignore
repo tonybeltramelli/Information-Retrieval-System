@@ -45,7 +45,10 @@ plugin.xml_gen
 src-gen
 xtend-gen
 
+<<<<<<< HEAD
 .cache
+=======
+>>>>>>> aa8de605fcd932de23694daf8626f9fc633baeb3
 .cache/
 .history/
 .lib/
