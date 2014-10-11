@@ -19,28 +19,46 @@ class Main
 	  this()
 	  
 	  val tipster = new TipsterStream("data/tipster/zips")
-	  //val queryTerms = Tokenizer.tokenize(query)
+	  val queryTerms = Tokenizer.tokenize(queries(0).toLowerCase())
 	  
 	  println("queries : "+queries.mkString(", "))
 	  println("documents : "+tipster.length)
 	  
 	  var length : Long = 0 
 	  var tokens : Long = 0
-	  for (doc <- tipster.stream.take(1000)) { 
-		  length += doc.content.length          
+	  for (doc <- tipster.stream.take(100)) { 
+		  length += doc.content.length   
 		  tokens += doc.tokens.length
+		  
+		  val score = _getScore(doc.tokens.map(t => t.toLowerCase()), queryTerms)
 	  }
 	  
-	  println("Final number of characters = " + length)
-	  println("Final number of tokens = " + tokens) 
-	  
-	  /*
-	  val zipDocStream = new ZipDirStream("data/tipster/zips")
-	  println("stream with "+zipDocStream.stream.length+" documents")
-	  
-	  val zipExplorer = new ZipExplorer("data/tipster/zips")
-	  
-	  println(zipExplorer.all.length)
-	  println(zipExplorer.all.mkString("\n"))*/
+	  println("final number of characters : " + length)
+	  println("final number of tokens : " + tokens) 
+	}
+	
+	private def _getTermFreq(list : List[String]) : Map[String,Int] =
+	{
+	  list.groupBy(identity).mapValues(l => l.length)
+	}
+	
+	private def _getScore (docTokens: List[String], queryTerms: List[String]) : Double =
+	{
+		val tfs = _getTermFreq(docTokens)
+		val qtfs = queryTerms.flatMap(q => tfs.get(q))
+
+		val numTermsInCommon = qtfs.filter(_ > 0).length
+		
+		println("tfs : " + tfs.mkString(", "))
+		println("qtfs : " + qtfs.mkString(", "))
+		println(numTermsInCommon+"\n")
+		
+		//val docEuLen = tfs.mapValues{case(x, y) => y*y}.sum.toDouble
+		/*
+		val queryLen = queryTerms.length.toDouble
+		val termOverlap = qtfs.sum / (docEuLen * queryLen)
+		
+		numTermsInCommon + termOverlap*/
+		0.0
 	}
 }
