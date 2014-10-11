@@ -30,10 +30,15 @@ class Main
 	{
 	  this()
 	  
+	  var qu = queries
+	  
+	  //for topic
+	  qu = _getTopics.map(_._1)
+	  
 	  val time = System.nanoTime()
 	  
 	  val tipster = new TipsterStream(ZIP_PATH)	  
-	  val queriesTokens = queries.map(q => Tokenizer.tokenize(q)).map(t => _stemTokens(t))
+	  val queriesTokens = qu.map(q => Tokenizer.tokenize(q)).map(t => _stemTokens(t))
 	  
 	  println("time 0 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
 	  
@@ -50,13 +55,9 @@ class Main
 		  val result = priorityQ.take(resultNumber)
 		  
 		  println("results for \""+query+"\" : "+result.mkString(", "))
-		  println("time 1 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
-		  
-		  val topics = _getTopics
-		  
 	  }
 	  
-	  println("time 2 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
+	  println("time 1 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
 	}
 	
 	private def _getTermFreq(list : List[String]) : Map[String,Int] =
@@ -90,10 +91,10 @@ class Main
 	private def _getTopics =
 	{
 	  val lines = Source.fromFile(TOPIC_PATH).getLines
-	  val topicsTitle = lines.filter(l => l.contains("<title>")).map(l => l.split(":")(1).trim)
+	  val topicsTitle = lines.filter(l => l.contains("<title>")).map(l => l.split(":")(1).trim.toLowerCase)
 	  val topicsNumber = lines.filter(l => l.contains("<num>")).map(l => l.split(":")(1).trim.toInt)
 	  
-	  topicsTitle.zip(topicsNumber)
+	  topicsTitle.zip(topicsNumber).toList
 	}
 	
 	private def _ordering(row: (String, Double)) = row._2
