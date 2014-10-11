@@ -4,25 +4,28 @@ import com.tonybeltramelli.desktop.util.ZipExplorer
 import ch.ethz.dal.tinyir.io.ZipDirStream
 import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.Tokenizer
+import com.github.aztek.porterstemmer.PorterStemmer
+import com.sun.xml.internal.bind.v2.TODO
 
 object Main {
 	def main(args: Array[String])
 	{
-	  new Main(args)
+	  new Main(args.toList)
 	}
 }
 
 class Main
 {
-	def this(queries: Array[String])
+	def this(queries: List[String])
 	{
 	  this()
 	  
 	  val tipster = new TipsterStream("data/tipster/zips")
-	  val queryTerms = Tokenizer.tokenize(queries(0).toLowerCase())
 	  
-	  println("queries : "+queries.mkString(", "))
-	  println("documents : "+tipster.length)
+	  val queriesTokens = _stemTokens(queries).map(q => Tokenizer.tokenize(q))
+	  
+	  prt("queries : "+queries.mkString(", "))
+	  prt("documents : "+tipster.length)
 	  
 	  var length : Long = 0 
 	  var tokens : Long = 0
@@ -30,11 +33,14 @@ class Main
 		  length += doc.content.length   
 		  tokens += doc.tokens.length
 		  
-		  val score = _getScore(doc.tokens.map(t => t.toLowerCase()), queryTerms)
+		  for (query <- queriesTokens)
+		  {
+			  val score = _getScore(_stemTokens(doc.tokens), query)
+		  }
 	  }
 	  
-	  println("final number of characters : " + length)
-	  println("final number of tokens : " + tokens) 
+	  prt("final number of characters : " + length)
+	  prt("final number of tokens : " + tokens)
 	}
 	
 	private def _getTermFreq(list : List[String]) : Map[String,Int] =
@@ -49,16 +55,27 @@ class Main
 
 		val numTermsInCommon = qtfs.filter(_ > 0).length
 		
-		println("tfs : " + tfs.mkString(", "))
-		println("qtfs : " + qtfs.mkString(", "))
-		println(numTermsInCommon+"\n")
+		prt("tfs : " + tfs.mkString(", "))
+		prt("qtfs : " + qtfs.mkString(", "))
+		prt(numTermsInCommon+"\n")
 		
-		//val docEuLen = tfs.mapValues{case(x, y) => y*y}.sum.toDouble
-		/*
+		val docEuclideanLen = tfs.map{case(a, b) => b * b}.sum.toDouble		
 		val queryLen = queryTerms.length.toDouble
-		val termOverlap = qtfs.sum / (docEuLen * queryLen)
+		val termOverlap = qtfs.sum / (docEuclideanLen * queryLen)
 		
-		numTermsInCommon + termOverlap*/
-		0.0
+		numTermsInCommon + termOverlap
+	}
+	
+	private def _stemTokens(list: List[String]) : List[String] = 
+	{
+	  list.map(t => t.toLowerCase()).map(PorterStemmer.stem(_))
+	}
+	
+	val isDebugMode: Boolean = true
+	
+	def prt(s : String)
+	{
+	  if(!isDebugMode) return
+	  println(s)
 	}
 }
