@@ -6,6 +6,7 @@ import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.Tokenizer
 import com.github.aztek.porterstemmer.PorterStemmer
 import com.sun.xml.internal.bind.v2.TODO
+import scala.collection.mutable.PriorityQueue
 
 object Main {
 	def main(args: Array[String])
@@ -20,22 +21,32 @@ class Main
 	{
 	  this()
 	  
+	  val time = System.nanoTime()
+	  
 	  val tipster = new TipsterStream("data/tipster/zips")
 	  
 	  val queriesTokens = _stemTokens(queries).map(q => Tokenizer.tokenize(q))
 	  
+	  println("time 0 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
+	  
 	  prt("queries : "+queries.mkString(", "))
 	  prt("documents : "+tipster.length)
+
+	  val docs = tipster.stream.take(1000)
 	  
 	  for (query <- queriesTokens)
 	  {
-		  val docs = tipster.stream.take(1000)
-		  val scores = docs.map(doc => doc.name -> _getScore(_stemTokens(doc.tokens), query)).toSeq.sortBy(_._2)
+		  //val scores = docs.map(doc => doc.name -> _getScore(_stemTokens(doc.tokens), query))//.sortBy(-_._2)
 		  
-		  val result = scores.take(resultNumber)
+		  val pQ = new PriorityQueue[(String, Double)]()(Ordering.by(_ordering))
+		  docs.foreach(d => pQ.enqueue((d.name, _getScore(_stemTokens(d.tokens), query))))
 		  
-		  println("Result for \""+query+"\" : "+result.mkString(", "))
+		  val result = pQ.take(resultNumber)
+		  
+		  println("results for \""+query+"\" : "+result.mkString(", "))
 	  }
+	  
+	  println("time 1 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
 	}
 	
 	private def _getTermFreq(list : List[String]) : Map[String,Int] =
@@ -65,6 +76,8 @@ class Main
 	{
 	  list.map(t => t.toLowerCase()).map(PorterStemmer.stem(_))
 	}
+	
+	private def _ordering(row: (String, Double)) = row._2
 	
 	val isDebugMode: Boolean = false
 	
