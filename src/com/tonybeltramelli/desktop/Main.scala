@@ -10,13 +10,13 @@ import com.sun.xml.internal.bind.v2.TODO
 object Main {
 	def main(args: Array[String])
 	{
-	  new Main(args.toList)
+	  new Main(args(0).toInt, args.slice(1, args.length).toList)
 	}
 }
 
 class Main
 {
-	def this(queries: List[String])
+	def this(resultNumber: Int, queries: List[String])
 	{
 	  this()
 	  
@@ -29,25 +29,12 @@ class Main
 	  
 	  for (query <- queriesTokens)
 	  {
-		  //val docs = tipster.stream.take(100)
+		  val docs = tipster.stream.take(1000)
+		  val scores = docs.map(doc => doc.name -> _getScore(_stemTokens(doc.tokens), query)).toSeq.sortBy(_._2)
 		  
-		  //val scores = docs.map(doc => doc.name -> _getScore(_stemTokens(doc.tokens), query))
+		  val result = scores.take(resultNumber)
 		  
-		  for (doc <- tipster.stream.take(100))
-		  { 			  
-			  val score = queriesTokens.map(q => q -> _getScore(_stemTokens(doc.tokens), q))
-			  
-			  /*
-			  for (query <- queriesTokens)
-			  {
-				  val score = _getScore(_stemTokens(doc.tokens), query)
-				  prt("score : "+score+"\n")
-			  }*/
-			  
-			  prt(score)
-		  }
-		  
-		  //prt(scores)
+		  println("Result for \""+query+"\" : "+result.mkString(", "))
 	  }
 	}
 	
@@ -79,7 +66,7 @@ class Main
 	  list.map(t => t.toLowerCase()).map(PorterStemmer.stem(_))
 	}
 	
-	val isDebugMode: Boolean = true
+	val isDebugMode: Boolean = false
 	
 	def prt(s : Any)
 	{
