@@ -27,20 +27,28 @@ class Main
 	  prt("queries : "+queries.mkString(", "))
 	  prt("documents : "+tipster.length)
 	  
-	  var length : Long = 0 
-	  var tokens : Long = 0
-	  for (doc <- tipster.stream.take(100)) { 
-		  length += doc.content.length   
-		  tokens += doc.tokens.length
+	  for (query <- queriesTokens)
+	  {
+		  //val docs = tipster.stream.take(100)
 		  
-		  for (query <- queriesTokens)
-		  {
-			  val score = _getScore(_stemTokens(doc.tokens), query)
+		  //val scores = docs.map(doc => doc.name -> _getScore(_stemTokens(doc.tokens), query))
+		  
+		  for (doc <- tipster.stream.take(100))
+		  { 			  
+			  val score = queriesTokens.map(q => q -> _getScore(_stemTokens(doc.tokens), q))
+			  
+			  /*
+			  for (query <- queriesTokens)
+			  {
+				  val score = _getScore(_stemTokens(doc.tokens), query)
+				  prt("score : "+score+"\n")
+			  }*/
+			  
+			  prt(score)
 		  }
+		  
+		  //prt(scores)
 	  }
-	  
-	  prt("final number of characters : " + length)
-	  prt("final number of tokens : " + tokens)
 	}
 	
 	private def _getTermFreq(list : List[String]) : Map[String,Int] =
@@ -57,7 +65,7 @@ class Main
 		
 		prt("tfs : " + tfs.mkString(", "))
 		prt("qtfs : " + qtfs.mkString(", "))
-		prt(numTermsInCommon+"\n")
+		prt(numTermsInCommon)
 		
 		val docEuclideanLen = tfs.map{case(a, b) => b * b}.sum.toDouble		
 		val queryLen = queryTerms.length.toDouble
@@ -73,7 +81,7 @@ class Main
 	
 	val isDebugMode: Boolean = true
 	
-	def prt(s : String)
+	def prt(s : Any)
 	{
 	  if(!isDebugMode) return
 	  println(s)
