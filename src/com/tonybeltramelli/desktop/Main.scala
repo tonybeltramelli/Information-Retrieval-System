@@ -42,9 +42,6 @@ class Main
 		  qu = topics.map(_._1)
 	  }
 	  
-	  //TODO remove
-	  qu = qu.take(10)
-	  
 	  val time = System.nanoTime()
 	  
 	  val tipster = new TipsterStream(ZIP_PATH)	  
@@ -81,9 +78,14 @@ class Main
 	  list.groupBy(identity).mapValues(l => l.length)
 	}
 	
+	private def _getlogTermFreq(tf: Map[String,Int]) : Map[String,Double] =
+	{
+	  tf.mapValues(v => log2(v.toDouble / tf.values.sum) + 1.0)	  
+	}
+	
 	private def _getScore (docTokens: List[String], queryTerms: List[String]) : Double =
 	{
-	  val tfs = _getTermFreq(docTokens)
+	  val tfs = _getlogTermFreq(_getTermFreq(docTokens))
 	  val qtfs = queryTerms.flatMap(q => tfs.get(q))
 
 	  val numTermsInCommon = qtfs.filter(_ > 0).length
@@ -93,8 +95,8 @@ class Main
 	  debug(numTermsInCommon)
 		
 	  val docEuclideanLen = tfs.map{case(a, b) => b * b}.sum.toDouble		
-      val queryLen = queryTerms.length.toDouble
-	  val termOverlap = qtfs.sum / (docEuclideanLen * queryLen)
+      val queryLength = queryTerms.length.toDouble
+	  val termOverlap = qtfs.sum / (docEuclideanLen * queryLength)
 		
 	  numTermsInCommon + termOverlap
 	}
@@ -133,6 +135,8 @@ class Main
 	}
 	
 	private def _ordering(row: (String, Double)) = row._2
+	
+	def log2(x: Double) = Math.log10(x) / Math.log10(2.0)
 	
 	val isDebugMode: Boolean = false
 	

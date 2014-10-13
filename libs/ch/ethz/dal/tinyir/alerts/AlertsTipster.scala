@@ -13,7 +13,7 @@ object AlertsTipster {
     val query = "Airbus Subsidies"
     val num = 100
     val alerts = new AlertsTipster(query,num)    
-    val tipster = new TipsterStream("zips")
+    val tipster = new TipsterStream("data/tipster/zips")
     
     val sw = new StopWatch; sw.start
     var iter = 0
@@ -28,7 +28,7 @@ object AlertsTipster {
     sw.stop
     println("Stopped time = " + sw.stopped)
     alerts.results.foreach(println)  
-    val rel = new TipsterGroundTruth("qrels").judgements.get("51").get.toSet
+    val rel = new TipsterGroundTruth("data/tipster/qrels").judgements.get("51").get.toSet
     val ret = alerts.results.map(r => r.title)
     val pr = new PrecisionRecall(ret,rel)
     println(pr.relevIdx.mkString(" "))
