@@ -1,23 +1,22 @@
 package com.tonybeltramelli.desktop.core
 
 import scala.collection.mutable.PriorityQueue
-
 import com.tonybeltramelli.desktop.util.Helper
-
 import ch.ethz.dal.tinyir.lectures.TipsterGroundTruth
 import ch.ethz.dal.tinyir.processing.XMLDocument
+import com.tonybeltramelli.desktop.core.scoring.AScoring
 
 class QueryProcessor
 {
-	def this(query: (List[String], Int), documents: Stream[XMLDocument], topics: List[(String, Int)])
+	def this(query: (List[String], Int), collection: Stream[(String, List[String])], topics: List[(String, Int)], scoringModel: AScoring)
 	{
 	  this
 	  
 	  val priorityQ : PriorityQueue[(String, Double)] = new PriorityQueue[(String, Double)]()(Ordering.by(Helper.ordering))
 	  
-	  for(d <- documents)
+	  for(d <- collection)
 	  {
-	    priorityQ.enqueue((d.name, _getScore(Helper.stemTokens(d.tokens), query._1)))
+	    priorityQ.enqueue((d._1, scoringModel.getScore(collection, d._2, query._1)))
 	  }
 	  
 	  val results : List[(String, Double)] = priorityQ.toList.sortBy(res => -res._2).take(Helper.RESULT_NUMBER)
@@ -28,34 +27,6 @@ class QueryProcessor
 	  {
 	      _assessPerformance(topics(query._2)._2.toString, results)
 	  }
-	}
-	
-	private def _getScore (docTokens: List[String], queryTerms: List[String]) : Double =
-	{ 
-	  val tfs = _getlogTermFreq(_getTermFreq(docTokens))
-	  val qtfs = queryTerms.flatMap(q => tfs.get(q))
-
-	  val numTermsInCommon = qtfs.filter(_ > 0).length
-		
-	  Helper.debug("tfs : " + tfs.mkString(", "))
-      Helper.debug("qtfs : " + qtfs.mkString(", "))
-	  Helper.debug(numTermsInCommon)
-		
-	  val docEuclideanLen = tfs.map{case(a, b) => b * b}.sum.toDouble		
-      val queryLength = queryTerms.length.toDouble
-	  val termOverlap = qtfs.sum / (docEuclideanLen * queryLength)
-		
-	  numTermsInCommon + termOverlap
-	}
-	
-	private def _getlogTermFreq(tf: Map[String,Int]) : Map[String,Double] =
-	{
-	  tf.mapValues(v => Helper.log2(v.toDouble / tf.values.sum) + 1.0)	  
-	}
-	
-	private def _getTermFreq(list : List[String]) : Map[String,Int] =
-	{
-	  list.groupBy(identity).mapValues(l => l.length)
 	}
 	
 	private def _assessPerformance(number: String, results : List[(String, Double)])
