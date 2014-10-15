@@ -1,4 +1,4 @@
-package com.tonybeltramelli.desktop.performance
+package com.tonybeltramelli.desktop.core
 
 import collection.Seq
 import math.{ min, max }
