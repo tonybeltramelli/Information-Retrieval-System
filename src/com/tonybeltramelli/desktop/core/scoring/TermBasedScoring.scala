@@ -7,7 +7,7 @@ class TermBasedScoring extends AScoring
 {
 	override def getScore (collection: Stream[(String, List[String])], document: List[String], query: List[String]) : Double =
 	{
-	  val tfs = _getlogTermFreq(_getTermFreq(document))
+	  val tfs = _getSquareRootTermFreq(_getTermFreq(document))
 	  val qtfs = query.flatMap(q => tfs.get(q))
 
 	  val numTermsInCommon = qtfs.filter(_ > 0).length
@@ -23,9 +23,14 @@ class TermBasedScoring extends AScoring
 	  numTermsInCommon + termOverlap
 	}
 	
-	private def _getlogTermFreq(tf: Map[String,Int]) : Map[String,Double] =
+	private def _getLogTermFreq(tf: Map[String,Int]) : Map[String,Double] =
 	{
-	  tf.mapValues(v => Helper.log2(v.toDouble / tf.values.sum) + 1.0)	  
+	  tf.mapValues(v => Helper.log2(v.toDouble / tf.values.sum) + 1.0)
+	}
+	
+	private def _getSquareRootTermFreq(tf: Map[String,Int]) : Map[String,Double] =
+	{
+	  tf.mapValues(v => Math.sqrt(v) + Math.sqrt(v + 1))
 	}
 	
 	private def _getTermFreq(doc : List[String]) : Map[String,Int] =

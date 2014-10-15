@@ -26,8 +26,6 @@ object Helper {
     println("time "+_i+" : " + (System.nanoTime() - _time) / 1000000000.0 + " seconds")
     _i += 1
   }
-  
-  def ordering(row: (String, Double)) = row._2
 	
   def log2(x: Double) = Math.log10(x) / Math.log10(2.0)
 }

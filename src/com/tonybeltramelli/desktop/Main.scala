@@ -39,7 +39,7 @@ class Main
 	  Helper.time
 	  println("stemming documents...")
 	  
-	  val documents = tipster.stream.take(10000)
+	  val documents = tipster.stream.take(10)
 	  val collection = documents.map(doc => (doc.name, _stemTokens(doc.tokens)))
 	  
 	  Helper.time
@@ -60,9 +60,8 @@ class Main
 	
 	private def _getTopics : List[(String, Int)] =
 	{
-	  val lines = Source.fromFile(Helper.TOPIC_PATH).getLines
-	  val topicsTitle = lines.filter(l => l.contains("<title>")).map(l => l.split(":")(1).trim.toLowerCase)
-	  val topicsNumber = lines.filter(l => l.contains("<num>")).map(l => l.split(":")(1).trim.toInt)
+	  val topicsTitle = Source.fromFile(Helper.TOPIC_PATH).getLines.filter(l => l.contains("<title>")).map(l => l.split(":")(1).trim.toLowerCase)
+	  val topicsNumber = Source.fromFile(Helper.TOPIC_PATH).getLines.filter(l => l.contains("<num>")).map(l => l.split(":")(1).trim.toInt)
 	  
 	  topicsTitle.zip(topicsNumber).toList
 	}
@@ -71,6 +70,6 @@ class Main
 	
 	private def _stemTokens(list: List[String]) : List[String] = 
 	{
-	  list.map(t => t.toLowerCase()).map(v => _stemStore.getOrElseUpdate(v ,PorterStemmer.stem(v)))
+	  list.map(t => t.toLowerCase()).map(v => _stemStore.getOrElseUpdate(v, PorterStemmer.stem(v)))
 	}
 }
