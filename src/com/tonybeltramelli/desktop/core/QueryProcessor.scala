@@ -23,8 +23,11 @@ class QueryProcessor
 	  val results : List[(String, Double)] = priorityQ.toList.sortBy(res => -res._2).take(Helper.RESULT_NUMBER)
 		  
 	  println("results for \""+query+"\" : "+results.mkString(", "))
-		  
-	  _assessPerformance(topics(query._2)._2.toString, results)
+	  
+	  if(topics != null && topics.contains(query._2))
+	  {
+	      _assessPerformance(topics(query._2)._2.toString, results)
+	  }
 	}
 	
 	private def _getScore (docTokens: List[String], queryTerms: List[String]) : Double =

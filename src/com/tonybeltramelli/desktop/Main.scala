@@ -27,7 +27,7 @@ class Main
 	  if(queries.length == 0)
 	  {
 		  topics = _getTopics
-		  qu = topics.map(_._1)
+		  qu = topics.map(_._1).take(2)
 	  }
 	  
 	  val time = System.nanoTime()
@@ -37,7 +37,7 @@ class Main
 	  
 	  println("time 0 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
 	  
-	  val docs = tipster.stream.take(1000)
+	  val docs = tipster.stream.take(5)
 	  var qp : QueryProcessor = null
 	  
 	  for(query <- queriesTokens)
