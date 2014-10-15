@@ -24,11 +24,11 @@ class QueryProcessor
 		  
 	  println("results for \""+query+"\" : "+results.mkString(", "))
 		  
-	  //_assessPerformance(topics(query._2)._2.toString, results)
+	  _assessPerformance(topics(query._2)._2.toString, results)
 	}
 	
 	private def _getScore (docTokens: List[String], queryTerms: List[String]) : Double =
-	{
+	{ 
 	  val tfs = _getlogTermFreq(_getTermFreq(docTokens))
 	  val qtfs = queryTerms.flatMap(q => tfs.get(q))
 

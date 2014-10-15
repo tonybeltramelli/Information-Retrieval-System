@@ -20,7 +20,7 @@ class Main
 	def this(queries: List[String])
 	{
 	  this
-
+	  
 	  var qu = queries
 	  var topics : List[(String, Int)] = null
 	  
@@ -38,10 +38,12 @@ class Main
 	  println("time 0 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
 	  
 	  val docs = tipster.stream.take(1000)
+	  var qp : QueryProcessor = null
 	  
 	  for(query <- queriesTokens)
 	  {
-	    val qp = new QueryProcessor(query, docs, topics)
+	    qp = null
+	    qp = new QueryProcessor(query, docs, topics)
 	  }
 	  
 	  println("time 1 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
