@@ -1,7 +1,6 @@
 package com.tonybeltramelli.desktop.core.scoring
 
 import com.tonybeltramelli.desktop.util.Helper
-import ch.ethz.dal.tinyir.processing.XMLDocument
 
 class TermBasedScoring extends AScoring
 {
@@ -31,10 +30,5 @@ class TermBasedScoring extends AScoring
 	private def _getSquareRootTermFreq(tf: Map[String,Int]) : Map[String,Double] =
 	{
 	  tf.mapValues(v => Math.sqrt(v) + Math.sqrt(v + 1))
-	}
-	
-	private def _getTermFreq(doc : List[String]) : Map[String,Int] =
-	{
-	  doc.groupBy(identity).mapValues(l => l.length)
 	}
 }

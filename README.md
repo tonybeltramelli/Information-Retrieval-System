@@ -5,6 +5,14 @@
 - For each query, it should output the top n results and calculate per-query (e.g., AP) and global quality metrics (e.g., MAP),
 - To measure the quality of your system's output, we make available a set of 50 topics (#51-100). For the first 40 of those, you have a set of human relevance judgements (qrels). The remaining 10 topics will be used to finally gauge the quality of your system on unseen queries. 
 
+
+
+https://github.com/mcartright/julien/blob/master/src/test/scala/julien/retrieval/JelinekMercerSpec.scala
+https://lucene.apache.org/core/4_0_0/core/org/apache/lucene/search/similarities/LMJelinekMercerSimilarity.html
+https://searchcode.com/codesearch/view/25295694/
+http://mkaz.com/2011/06/28/how-to-use-scala-and-lucene-to-create-a-basic-search-application/
+
+
 TinyIR.jar :
 
 ch/ethz/dal/tinyir/

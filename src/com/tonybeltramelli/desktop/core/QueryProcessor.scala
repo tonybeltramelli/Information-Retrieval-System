@@ -1,11 +1,9 @@
 package com.tonybeltramelli.desktop.core
 
-import scala.collection.mutable.PriorityQueue
-import com.tonybeltramelli.desktop.util.Helper
-import ch.ethz.dal.tinyir.lectures.TipsterGroundTruth
-import ch.ethz.dal.tinyir.processing.XMLDocument
 import com.tonybeltramelli.desktop.core.scoring.AScoring
-import scala.collection.mutable.ListBuffer
+import com.tonybeltramelli.desktop.util.Helper
+
+import ch.ethz.dal.tinyir.lectures.TipsterGroundTruth
 
 class QueryProcessor
 {
@@ -21,7 +19,6 @@ class QueryProcessor
 	  
 	  if(topics != null)
 	  {
-		  println("----> "+query._2+" - " +topics(query._2)._2)
 	      _assessPerformance(topics(query._2)._2.toString, results)
 	  }
 	}

@@ -1,5 +1,7 @@
 package com.tonybeltramelli.desktop.core
 
+import scala.annotation.elidable
+import scala.annotation.elidable.ASSERTION
 import scala.collection.Seq
 import scala.math.max
 

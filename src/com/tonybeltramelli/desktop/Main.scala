@@ -1,15 +1,16 @@
 package com.tonybeltramelli.desktop
 
 import scala.io.Source
+
+import com.github.aztek.porterstemmer.PorterStemmer
 import com.tonybeltramelli.desktop.core.QueryProcessor
+import com.tonybeltramelli.desktop.core.scoring.AScoring
+import com.tonybeltramelli.desktop.core.scoring.LanguageBasedScoring
+import com.tonybeltramelli.desktop.core.scoring.TermBasedScoring
 import com.tonybeltramelli.desktop.util.Helper
+
 import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.Tokenizer
-import com.tonybeltramelli.desktop.core.scoring.AScoring
-import com.tonybeltramelli.desktop.core.scoring.TermBasedScoring
-import com.tonybeltramelli.desktop.core.scoring.LanguageBasedScoring
-import com.github.aztek.porterstemmer.PorterStemmer
-import scala.collection.mutable.ListBuffer
 
 object Main {
 	def main(args: Array[String])
@@ -30,7 +31,7 @@ class Main
 	  if(queries.length == 0)
 	  {
 		  topics = _getTopics
-		  qu = topics.map(_._1).take(2)
+		  qu = topics.map(_._1).take(1)
 	  }
 	  
 	  val tipster = new TipsterStream(Helper.ZIP_PATH)	  
@@ -39,7 +40,7 @@ class Main
 	  Helper.time
 	  println("stemming documents...")
 	  
-	  val documents = tipster.stream.take(10)
+	  val documents = tipster.stream.take(2)
 	  val collection = documents.map(doc => (doc.name, _stemTokens(doc.tokens)))
 	  
 	  Helper.time

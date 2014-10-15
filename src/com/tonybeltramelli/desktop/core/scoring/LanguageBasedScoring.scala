@@ -1,12 +1,17 @@
 package com.tonybeltramelli.desktop.core.scoring
 
-import ch.ethz.dal.tinyir.processing.XMLDocument
-
 class LanguageBasedScoring extends AScoring
 {  
 	override def getScore (collection: Stream[(String, List[String])], document: List[String], query: List[String]) : Double =
 	{
-	  println("fill the language-based scoring method")
-	  0.0
+	  val lambda = 0.1f //(0.1f -> 0.7f)
+	  
+	  val tfs = _getTermFreq(document)
+	  val cfs = _getTermFreq(collection.flatMap(d => d._2).toList)
+	  
+	  val qtfs = query.flatMap(q => tfs.get(q))
+	  val ctfs = query.flatMap(q => cfs.get(q))
+	 
+	  ((1 - lambda) * (qtfs.sum / tfs.map(_._2).sum)) + (lambda) * (qtfs.sum / cfs.map(_._2).sum)
     }
 }
