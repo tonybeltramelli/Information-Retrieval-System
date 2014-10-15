@@ -20,7 +20,7 @@ class PrecisionRecall[A] (ranked: Seq[A], relev: Set[A]) {
   val iprecs = precs.scanRight(0.0)( (a,b) => Math.max(a,b)).dropRight(1)
   
   // number of results to reach recall level 
-  private def recall2num(recall: Double) = {
+  def recall2num(recall: Double) = {
     assert(recall >=0.0 && recall <=1.0)
     min((recall * num).ceil.toInt,num) 
   }

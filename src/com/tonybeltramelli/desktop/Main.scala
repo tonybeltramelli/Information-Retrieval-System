@@ -9,6 +9,7 @@ import com.tonybeltramelli.desktop.core.scoring.AScoring
 import com.tonybeltramelli.desktop.core.scoring.TermBasedScoring
 import com.tonybeltramelli.desktop.core.scoring.LanguageBasedScoring
 import com.github.aztek.porterstemmer.PorterStemmer
+import scala.collection.mutable.ListBuffer
 
 object Main {
 	def main(args: Array[String])
@@ -29,18 +30,20 @@ class Main
 	  if(queries.length == 0)
 	  {
 		  topics = _getTopics
-		  qu = topics.map(_._1)
+		  qu = topics.map(_._1).take(2)
 	  }
-	  
-	  val time = System.nanoTime()
 	  
 	  val tipster = new TipsterStream(Helper.ZIP_PATH)	  
 	  val queriesTokens = qu.map(q => Tokenizer.tokenize(q)).map(t => _stemTokens(t)).zipWithIndex
 	  
-	  println("time 0 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
+	  Helper.time
+	  println("stemming documents...")
 	  
-	  val documents = tipster.stream.take(1000)
+	  val documents = tipster.stream.take(10000)
 	  val collection = documents.map(doc => (doc.name, _stemTokens(doc.tokens)))
+	  
+	  Helper.time
+	  println("processing...")
 	  
 	  var qp : QueryProcessor = null
 	  
@@ -52,7 +55,7 @@ class Main
 	    qp = new QueryProcessor(query, collection, topics, scoringModel)
 	  }
 	  
-	  println("time 1 : " + (System.nanoTime() - time) / 1000000000.0 + " seconds")
+	  Helper.time
 	}
 	
 	private def _getTopics : List[(String, Int)] =
@@ -64,8 +67,10 @@ class Main
 	  topicsTitle.zip(topicsNumber).toList
 	}
 	
+	private val _stemStore : collection.mutable.Map[String, String] = collection.mutable.Map()
+	
 	private def _stemTokens(list: List[String]) : List[String] = 
 	{
-	  list.map(t => t.toLowerCase()).map(PorterStemmer.stem(_))
+	  list.map(t => t.toLowerCase()).map(v => _stemStore.getOrElseUpdate(v ,PorterStemmer.stem(v)))
 	}
 }

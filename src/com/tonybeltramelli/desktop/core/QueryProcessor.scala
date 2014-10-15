@@ -37,10 +37,10 @@ class QueryProcessor
 	  {
 	    val relevant = judgements.get(number).get.toSet
 	    val retrieved = results.map(r => r._1)
-	    val precisionRecall = new PrecisionRecall(retrieved, relevant)
+	    val precisionRecall = new PrecRec(retrieved, relevant)
 		    
-	    val precision = PrecisionRecall.evaluate(retrieved.toSet, relevant).precision
-		val recall = PrecisionRecall.evaluate(retrieved.toSet, relevant).recall
+	    val precision = PrecRec.evaluate(retrieved.toSet, relevant).precision
+		val recall = PrecRec.evaluate(retrieved.toSet, relevant).recall
 		
 		println("	precision "+precision+", recall : "+recall)
 		println("	precision at recall " + recall + " = " + precisionRecall.precAt(recall, false))
