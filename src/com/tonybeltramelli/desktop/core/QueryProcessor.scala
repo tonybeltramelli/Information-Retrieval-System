@@ -11,16 +11,18 @@ class QueryProcessor
 	{
 	  this
 	  
+	  /*
+	  
 	  val results = collection.map(d => (
 	      d._1 -> scoringModel.getScore(d._1, query._1)
 	      )).toList.sortBy(res => -res._2)
 	  
-	  println("results for \""+query+"\" : "+results.mkString(", "))
+	  //println("results for \""+query+"\" : "+results.mkString(", "))
 	  
 	  if(topics != null)
 	  {
 	      _assessPerformance(topics(query._2)._2.toString, results)
-	  }
+	  }*/
 	}
 	
 	private def _assessPerformance(number: String, results : List[(String, Double)])
@@ -36,8 +38,8 @@ class QueryProcessor
 	  val precision = PrecRec.evaluate(retrieved.toSet, relevant).precision
 	  val recall = PrecRec.evaluate(retrieved.toSet, relevant).recall
 		
-	  println("	precision "+precision+", recall : "+recall)
-	  println("	precision at recall " + recall + " = " + precisionRecall.precAt(recall, false))
-	  println("	precision at recall " + recall + " = " + precisionRecall.precAt(recall, true) + " (interpolated)")
+	  //println("	precision "+precision+", recall : "+recall)
+	  //println("	precision at recall " + recall + " = " + precisionRecall.precAt(recall, false))
+	  //println("	precision at recall " + recall + " = " + precisionRecall.precAt(recall, true) + " (interpolated)")
 	}
 }

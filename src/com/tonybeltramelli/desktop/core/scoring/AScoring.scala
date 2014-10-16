@@ -1,17 +1,32 @@
 package com.tonybeltramelli.desktop.core.scoring
 
-import collection.mutable.{Map => MutMap}
+import scala.collection.mutable.{Map => MutMap}
 
-abstract class AScoring(collection: Stream[(String, List[String])])
+import com.tonybeltramelli.desktop.core.PrecRec
+import com.tonybeltramelli.desktop.util.Helper
+
+import ch.ethz.dal.tinyir.lectures.TipsterGroundTruth
+
+trait AScoring
 {
-	protected val _cfs = _getCollectionFreq(collection)
-	protected val _cfsSum = _cfs.map(_._2).sum
+	protected var _tfss : MutMap[String, (Map[String, Double], Double)] = MutMap[String, (Map[String, Double], Double)]()
 	
-	protected val _allTfs : Map[String, Map[String, Double]] = collection.map(doc => (doc._1 -> _getTermFreq(doc._2))).toMap
-	protected val _allTfsSum : Map[String, Double] = _allTfs.mapValues(v => v.map(_._2).sum)
-  
-	def getScore(documentName: String, query: List[String]) : Double
+	protected var _cfs : MutMap[String, Double] = MutMap() 
+	protected var _cfsSum : Double = 0.0
+	
+	def feed(documentName: String, document: List[String], queries: List[(List[String], Int)])
+	{
+	  val tfs : Map[String, Double] = _getTermFreq(document)
+	  val tfsSum : Double = tfs.map(v => v._2).sum
+	  
+	  _cfsSum += tfsSum
+	  tfs.filter(t => queries.map(q => q._1).exists(q => q.contains(t._1))).foreach(t => _cfs(t._1) = _cfs.get(t._1).getOrElse(0.0) + t._2)
+	
+	  _tfss += (documentName -> (tfs, tfsSum))
+	}
 
+	def getScore(f: (Map[String, Double], Double), query: List[String]) : Double
+	
 	private def _getTermFreq(doc: List[String]) : Map[String, Double] =
 	{
 	  doc.groupBy(identity).mapValues(l => l.length)
@@ -21,4 +36,7 @@ abstract class AScoring(collection: Stream[(String, List[String])])
 	{
 	  _getTermFreq(collection.flatMap(d => d._2).toList)
 	}
+	
+	def get = _tfss
+	def getNames = {_tfss.map(f =>  f._1)}
 }

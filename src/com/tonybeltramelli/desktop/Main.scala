@@ -1,18 +1,14 @@
 package com.tonybeltramelli.desktop
 
 import scala.io.Source
-
 import com.github.aztek.porterstemmer.PorterStemmer
-import com.tonybeltramelli.desktop.core.QueryProcessor
-import com.tonybeltramelli.desktop.core.scoring.AScoring
-import com.tonybeltramelli.desktop.core.scoring.LanguageBasedScoring
-import com.tonybeltramelli.desktop.core.scoring.TermBasedScoring
 import com.tonybeltramelli.desktop.util.Helper
-
-import collection.mutable.{Map => MutMap}
-
 import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.Tokenizer
+import com.tonybeltramelli.desktop.core.scoring.AScoring
+import com.tonybeltramelli.desktop.core.scoring.TermBasedScoring
+import com.tonybeltramelli.desktop.core.scoring.LanguageBasedScoring
+import ch.ethz.dal.tinyir.lectures.TipsterGroundTruth
 
 object Main {
 	def main(args: Array[String])
@@ -32,36 +28,76 @@ class Main
 	  
 	  if(queries.length == 0)
 	  {
+		  Helper.time
+		  println("get topics...")
+	    
 		  topics = _getTopics
-		  qu = topics.map(_._1)
+		  qu = topics.map(_._1).take(3)
 	  }
 	  
-	  val tipster = new TipsterStream(Helper.ZIP_PATH)	  
-	  val queriesTokens = qu.map(q => Tokenizer.tokenize(q)).map(t => _stemTokens(t)).zipWithIndex
+	  Helper.time
+	  println("tokenize and stem queries...")
+	  
+	  val queriesTokens = qu.map(q => Tokenizer.tokenize(q)).map(t => Helper.stemTokens(t).groupBy(identity).map(_._1).toList).zipWithIndex	 
 	  
 	  Helper.time
-	  println("stemming documents...")
+	  println("get collection...")
 	  
-	  val documents = tipster.stream.take(1000)
-	  val collection = documents.map(doc => (doc.name, _stemTokens(doc.tokens)))
-	  
-	  var qp : QueryProcessor = null
-	  
+	  val collection = new TipsterStream(Helper.ZIP_PATH).stream.take(4)  
+
 	  Helper.time
-	  println("building frequencies...")
+	  println("start processing...")
 	  
-	  val scoringModel: AScoring = if(!useLanguageModel) new TermBasedScoring(collection) else new LanguageBasedScoring(collection)
+	  var step = 0
+
+	  val scoringModel: AScoring = if(!useLanguageModel) new TermBasedScoring else new LanguageBasedScoring
 	  
-	  Helper.time
-	  println("processing...")
-	  
-	  for(query <- queriesTokens)
+	  for(doc <- collection)
 	  {
-	    qp = null
-	    qp = new QueryProcessor(query, collection, topics, scoringModel)
-	  }
+	    scoringModel.feed(doc.name, Helper.stemTokens(doc.tokens), queriesTokens) 
+	    
+	    if(step > 0 && step % 1000 == 0)
+	    {
+	      Helper.time
+	      println(step + " documents processed")
+	    }
+	    
+	    step += 1
+	  }  
 	  
+	  for(n <- scoringModel.getNames)
+	  {
+	    val results = queriesTokens.map(q => (q._2, scoringModel.getScore(scoringModel.get(n), q._1)))
+	    
+	    for(r <- results)
+	    {
+	      println(n + ", query : " + r._1 + ", result : " + r._2)
+	    }
+	    
+	    //doc.name -> (query.name : score)
+	    //_._1 -> _._2._1 : _._2._2
+	    //query.name -> (doc.name : score)
+	    //_._2._1 -> _._1 : _._2._2
+	  }	  
+	  
+	  val f = scoringModel.getNames.map(n => (n, queriesTokens.map(q => (q._2, scoringModel.getScore(scoringModel.get(n), q._1)))))
+	  
+	  println(f.mkString(", "))
+	  
+	  println("script done")
 	  Helper.time
+	}
+	
+	private def _assessPerformance(topics: List[(String, Int)])
+	{
+	  val judgements = new TipsterGroundTruth(Helper.QRELS_PATH).judgements
+		
+	  for(topic <- topics)
+	  {
+		  if(!judgements.contains(topic._2.toString)) return
+		  
+		  
+	  }  
 	}
 	
 	private def _getTopics : List[(String, Int)] =
@@ -70,12 +106,5 @@ class Main
 	  val topicsNumber = Source.fromFile(Helper.TOPIC_PATH).getLines.filter(l => l.contains("<num>")).map(l => l.split(":")(1).trim.toInt)
 	  
 	  topicsTitle.zip(topicsNumber).toList
-	}
-	
-	private val _stemStore : MutMap[String, String] = MutMap()
-	
-	private def _stemTokens(list: List[String]) : List[String] = 
-	{
-	  list.map(t => t.toLowerCase()).map(v => _stemStore.getOrElseUpdate(v, PorterStemmer.stem(v)))
 	}
 }
