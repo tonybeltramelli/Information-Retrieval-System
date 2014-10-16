@@ -12,13 +12,13 @@ object Helper {
   val TOPIC_PATH = ROOT_PATH + "/topics"
   val RESULT_NUMBER = 100
 
-  val isDebugMode: Boolean = false
+  val IS_DEBUG_MODE: Boolean = false
   
   private var _i = 0
   private var _time : Long = System.nanoTime()
 
   def debug(s: Any) {
-    if (!isDebugMode) return
+    if (!IS_DEBUG_MODE) return
     println(s)
   }
   

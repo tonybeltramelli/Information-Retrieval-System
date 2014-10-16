@@ -9,6 +9,8 @@ import com.tonybeltramelli.desktop.core.scoring.LanguageBasedScoring
 import com.tonybeltramelli.desktop.core.scoring.TermBasedScoring
 import com.tonybeltramelli.desktop.util.Helper
 
+import collection.mutable.{Map => MutMap}
+
 import ch.ethz.dal.tinyir.io.TipsterStream
 import ch.ethz.dal.tinyir.processing.Tokenizer
 
@@ -31,7 +33,7 @@ class Main
 	  if(queries.length == 0)
 	  {
 		  topics = _getTopics
-		  qu = topics.map(_._1).take(2)
+		  qu = topics.map(_._1)
 	  }
 	  
 	  val tipster = new TipsterStream(Helper.ZIP_PATH)	  
@@ -40,13 +42,13 @@ class Main
 	  Helper.time
 	  println("stemming documents...")
 	  
-	  val documents = tipster.stream.take(10)
+	  val documents = tipster.stream.take(1000)
 	  val collection = documents.map(doc => (doc.name, _stemTokens(doc.tokens)))
 	  
 	  var qp : QueryProcessor = null
 	  
 	  Helper.time
-	  println("building collection frequency...")
+	  println("building frequencies...")
 	  
 	  val scoringModel: AScoring = if(!useLanguageModel) new TermBasedScoring(collection) else new LanguageBasedScoring(collection)
 	  
@@ -70,7 +72,7 @@ class Main
 	  topicsTitle.zip(topicsNumber).toList
 	}
 	
-	private val _stemStore : collection.mutable.Map[String, String] = collection.mutable.Map()
+	private val _stemStore : MutMap[String, String] = MutMap()
 	
 	private def _stemTokens(list: List[String]) : List[String] = 
 	{

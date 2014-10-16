@@ -12,7 +12,7 @@ class QueryProcessor
 	  this
 	  
 	  val results = collection.map(d => (
-	      d._1 -> scoringModel.getScore(d._2, query._1)
+	      d._1 -> scoringModel.getScore(d._1, query._1)
 	      )).toList.sortBy(res => -res._2)
 	  
 	  println("results for \""+query+"\" : "+results.mkString(", "))

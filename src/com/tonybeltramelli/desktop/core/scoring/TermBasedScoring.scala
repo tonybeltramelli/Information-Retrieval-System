@@ -4,9 +4,9 @@ import com.tonybeltramelli.desktop.util.Helper
 
 class TermBasedScoring(collection: Stream[(String, List[String])]) extends AScoring(collection: Stream[(String, List[String])])
 {
-	override def getScore(document: List[String], query: List[String]) : Double =
+	override def getScore(documentName: String, query: List[String]) : Double =
 	{
-	  val tfs = _getSquareRootTermFreq(_getTermFreq(document))
+	  val tfs = _getSquareRootTermFreq(_allTfs.get(documentName).get)
 	  val qtfs = query.flatMap(q => tfs.get(q))
 
 	  val numTermsInCommon = qtfs.filter(_ > 0).length

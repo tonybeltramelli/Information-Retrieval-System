@@ -12,6 +12,10 @@ https://lucene.apache.org/core/4_0_0/core/org/apache/lucene/search/similarities/
 https://searchcode.com/codesearch/view/25295694/
 http://mkaz.com/2011/06/28/how-to-use-scala-and-lucene-to-create-a-basic-search-application/
 
+Optimizations :
+- Stem all documents at once before processing
+- Compute collection frequency, collection frequencies sums, term frequency and term frequencies sums for all documents at once, storing them for later use instead of computing them each time
+
 
 TinyIR.jar :
 
