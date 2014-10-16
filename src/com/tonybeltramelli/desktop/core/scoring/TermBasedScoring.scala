@@ -2,9 +2,9 @@ package com.tonybeltramelli.desktop.core.scoring
 
 import com.tonybeltramelli.desktop.util.Helper
 
-class TermBasedScoring extends AScoring
+class TermBasedScoring(collection: Stream[(String, List[String])]) extends AScoring(collection: Stream[(String, List[String])])
 {
-	override def getScore (collection: Stream[(String, List[String])], document: List[String], query: List[String]) : Double =
+	override def getScore(document: List[String], query: List[String]) : Double =
 	{
 	  val tfs = _getSquareRootTermFreq(_getTermFreq(document))
 	  val qtfs = query.flatMap(q => tfs.get(q))
@@ -22,12 +22,12 @@ class TermBasedScoring extends AScoring
 	  numTermsInCommon + termOverlap
 	}
 	
-	private def _getLogTermFreq(tf: Map[String,Int]) : Map[String,Double] =
+	private def _getLogTermFreq(tf: Map[String, Double]) : Map[String, Double] =
 	{
 	  tf.mapValues(v => Helper.log2(v.toDouble / tf.values.sum) + 1.0)
 	}
 	
-	private def _getSquareRootTermFreq(tf: Map[String,Int]) : Map[String,Double] =
+	private def _getSquareRootTermFreq(tf: Map[String, Double]) : Map[String, Double] =
 	{
 	  tf.mapValues(v => Math.sqrt(v) + Math.sqrt(v + 1))
 	}

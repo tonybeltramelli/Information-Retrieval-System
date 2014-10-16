@@ -31,7 +31,7 @@ class Main
 	  if(queries.length == 0)
 	  {
 		  topics = _getTopics
-		  qu = topics.map(_._1).take(1)
+		  qu = topics.map(_._1).take(2)
 	  }
 	  
 	  val tipster = new TipsterStream(Helper.ZIP_PATH)	  
@@ -40,15 +40,18 @@ class Main
 	  Helper.time
 	  println("stemming documents...")
 	  
-	  val documents = tipster.stream.take(2)
+	  val documents = tipster.stream.take(10)
 	  val collection = documents.map(doc => (doc.name, _stemTokens(doc.tokens)))
-	  
-	  Helper.time
-	  println("processing...")
 	  
 	  var qp : QueryProcessor = null
 	  
-	  val scoringModel: AScoring = if(!useLanguageModel) new TermBasedScoring() else new LanguageBasedScoring()
+	  Helper.time
+	  println("building collection frequency...")
+	  
+	  val scoringModel: AScoring = if(!useLanguageModel) new TermBasedScoring(collection) else new LanguageBasedScoring(collection)
+	  
+	  Helper.time
+	  println("processing...")
 	  
 	  for(query <- queriesTokens)
 	  {
