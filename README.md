@@ -1,5 +1,22 @@
 
 - Parses a document collection in a single-pass streaming fashion,
+Information-Retrieval-System
+============================
+
+Student project Autumn 2014 - [ETH Zurich](www.ethz.ch/en)
+
+##Usage
+
+```bash
+Usage: 
+ <root path> <use language model> <only last 10 queries> <document number> <queries>(optional)
+ <root path> : String, path to the tipster folder
+ <use language model> : Boolean, true = language-based model / false = term-based model
+ <only last 10 queries> : Boolean
+ <document number> : Int, number of document in the stream to process, -1 for all
+ <queries> : String, "query1" "query2" ... "queryN" / if not defined topics queries processed
+```
+
 - Handles multiple queries simultaneously,
 - Allow choice of different language models (at least one term-based model and one language model),
 - For each query, it should output the top n results and calculate per-query (e.g., AP) and global quality metrics (e.g., MAP),

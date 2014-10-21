@@ -14,24 +14,26 @@ import ch.ethz.dal.tinyir.processing.Tokenizer
 object Main {
 	def main(args: Array[String])
 	{
-	  if(args.length != 2)
+	  if(args.length != 4)
 	  {
 		println("Usage: \n")
-		println(" <root path> <use language model> <queries>(optional)\n")
+		println(" <root path> <use language model> <only last 10 queries> <document number> <queries>(optional)\n")
 		println(" <root path> : String, path to the tipster folder\n")
 		println(" <use language model> : Boolean, true = language-based model / false = term-based model\n")
+		println(" <only last 10 queries> : Boolean\n")
+		println(" <document number> : Int, number of document in the stream to process, -1 for all\n")
 		println(" <queries> : String, \"query1\" \"query2\" ... \"queryN\" / if not defined topics queries processed")
 		
 		System.exit(1)
 	  }
 	  
-	  new Main(args(0).toString, args(1).toBoolean, args.slice(2, args.length).toList)
+	  new Main(args(0).toString, args(1).toBoolean, args(2).toBoolean, args(3).toInt, args.slice(4, args.length).toList)
 	}
 }
 
 class Main
 {	
-	def this(rootPath: String, useLanguageModel: Boolean, queries: List[String])
+	def this(rootPath: String, useLanguageModel: Boolean, onlyUseLastQueries: Boolean, documentNumber: Int, queries: List[String])
 	{
 	  this
 	  
@@ -46,6 +48,9 @@ class Main
 		  println("get topics...")
 	    
 		  topics = _getTopics
+		  
+		  if(onlyUseLastQueries) topics = topics.takeRight(10)
+		  
 		  qu = topics.map(_._1)
 	  }
 	  
@@ -57,7 +62,7 @@ class Main
 	  Helper.time
 	  println("get collection...")
 	  
-	  val collection = new TipsterStream(Helper.getPath(Helper.ZIP_PATH)).stream.take(1000)  
+	  val collection = new TipsterStream(Helper.getPath(Helper.ZIP_PATH)).stream.take(if(documentNumber < 0) Int.MaxValue else documentNumber)
 
 	  Helper.time
 	  println("start processing...")
@@ -83,24 +88,26 @@ class Main
 	  println("gather results")
 	  
 	  val results = Helper.flipDimensions(scoringModel.getNames.map(n => (n, queriesTokens.map(q => (q._2, scoringModel.getScore(scoringModel.get(n), q._1))))))
+	  				.map(q => q._1 -> q._2.toList.sortBy(res => -res._2).take(Helper.RESULT_NUMBER))
 	  
 	  Helper.time
 	  println("assess performances")
 	  
-	  step = 0
-	  val perfAssessor = new PerformanceAssessor
-	  
-	  for(q <- results)
+	  if(!onlyUseLastQueries)
 	  {
-	    perfAssessor.assessPerformance(topics(q._1)._2.toString, q._2.toList)
-	    
-	    Helper.time
-	    println(step + " done")
-	    
-	    step += 1
+		  val perfAssessor = new PerformanceAssessor
+		  
+		  for(q <- results)
+		  {
+		    perfAssessor.assessPerformance(topics(q._1)._2.toString, q._2.toList)
+		  }
+	
+		  println("MAP : "+perfAssessor.getMeanAveragePrecision)
+	  }else{
+		  Helper.printToFile(results, topics, useLanguageModel)	    
 	  }
 	  
-	  println("script done, MAP : "+perfAssessor.getMeanAveragePrecision)
+	  println("script done")
 	  Helper.time
 	}
 	
