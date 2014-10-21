@@ -2,11 +2,6 @@ package com.tonybeltramelli.desktop.core.scoring
 
 import scala.collection.mutable.{Map => MutMap}
 
-import com.tonybeltramelli.desktop.core.PrecRec
-import com.tonybeltramelli.desktop.util.Helper
-
-import ch.ethz.dal.tinyir.lectures.TipsterGroundTruth
-
 trait AScoring
 {
 	protected var _tfss : MutMap[String, (Map[String, Double], Double)] = MutMap[String, (Map[String, Double], Double)]()

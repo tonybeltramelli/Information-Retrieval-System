@@ -8,18 +8,27 @@ class Helper {
 }
 
 object Helper {
-  val ROOT_PATH = "data/tipster/"
-  val ZIP_PATH = ROOT_PATH + "/zips"
-  val QRELS_PATH = ROOT_PATH + "/qrels"
-  val TOPIC_PATH = ROOT_PATH + "/topics"
+  val ZIP_PATH = "/zips"
+  val QRELS_PATH = "/qrels"
+  val TOPIC_PATH = "/topics"
   
   val RESULT_NUMBER = 100
   var TOKEN_MAX_SIZE = 100000
 
   val IS_DEBUG_MODE: Boolean = false
+
+  private var rootPath = ""
   
   private var _i = 0
   private var _time : Long = System.nanoTime()
+  
+  def getPath(r: String ) : String = {
+    rootPath + r
+  }
+  
+  def setRootPath(r: String) {
+    rootPath = r
+  }
 
   def debug(s: Any) {
     if (!IS_DEBUG_MODE) return
