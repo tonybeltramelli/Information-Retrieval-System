@@ -80,7 +80,7 @@ class Main
 	    //_._2._1 -> _._1 : _._2._2
 	  }	  
 	  
-	  val f = scoringModel.getNames.map(n => (n, queriesTokens.map(q => (q._2, scoringModel.getScore(scoringModel.get(n), q._1)))))
+	  val f = Helper.flipDimensions(scoringModel.getNames.map(n => (n, queriesTokens.map(q => (q._2, scoringModel.getScore(scoringModel.get(n), q._1))))))
 	  
 	  println(f.mkString(", "))
 	  
