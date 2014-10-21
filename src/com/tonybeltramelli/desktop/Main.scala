@@ -14,6 +14,17 @@ import ch.ethz.dal.tinyir.processing.Tokenizer
 object Main {
 	def main(args: Array[String])
 	{
+	  if(args.length != 2)
+	  {
+		println("Usage: \n")
+		println(" <root path> <use language model> <queries>(optional)\n")
+		println(" <root path> : String, path to the tipster folder\n")
+		println(" <use language model> : Boolean, true = language-based model / false = term-based model\n")
+		println(" <queries> : String, \"query1\" \"query2\" ... \"queryN\" / if not defined topics queries processed")
+		
+		System.exit(1)
+	  }
+	  
 	  new Main(args(0).toString, args(1).toBoolean, args.slice(2, args.length).toList)
 	}
 }
