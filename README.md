@@ -1,5 +1,4 @@
 
-- Parses a document collection in a single-pass streaming fashion,
 Information-Retrieval-System
 ============================
 
@@ -12,35 +11,45 @@ Usage:
  <root path> <use language model> <only last 10 queries> <document number> <queries>(optional)
  <root path> : String, path to the tipster folder
  <use language model> : Boolean, true = language-based model / false = term-based model
- <only last 10 queries> : Boolean
+ <only last 10 queries> : Boolean, true = only use the last test queries / false = use all the provided topics queries
  <document number> : Int, number of document in the stream to process, -1 for all
- <queries> : String, "query1" "query2" ... "queryN" / if not defined topics queries processed
+ <queries> : String, possibility to input custom queries such as "query1" "query2" ... "queryN" / if not defined the topics queries are used as input
 ```
 
-- Handles multiple queries simultaneously,
-- Allow choice of different language models (at least one term-based model and one language model),
-- For each query, it should output the top n results and calculate per-query (e.g., AP) and global quality metrics (e.g., MAP),
-- To measure the quality of your system's output, we make available a set of 50 topics (#51-100). For the first 40 of those, you have a set of human relevance judgements (qrels). The remaining 10 topics will be used to finally gauge the quality of your system on unseen queries. 
+##Architecture
 
+com.tonybeltramelli.desktop.
+    core.
+        perf.
+            PerformanceAssessor.scala : wrapper used to assess precision, recall and mean average precision
+            PrecisionRecallAssessor.scala : extends ch.ethz.dal.tinyir.lectures.PrecisionRecall, used by PerformanceAssessor to assess performance
+        scoring.
+            AScoring.scala : trait use to encapsulate scoring logic
+            LanguageBasedScoring.scala : extends AScoring, use of maximum likelihood estimation and Jelinek-Mercer smoothing to score
+            TermBasedScoring.scala : extends AScoring, use of square root linear transformation on term frequencies
+    util.
+        Helper.scala : contains constants value and utils functions
+    Main.scala : entry point, algorithm flow and topic loading
 
-
-https://github.com/mcartright/julien/blob/master/src/test/scala/julien/retrieval/JelinekMercerSpec.scala
-https://lucene.apache.org/core/4_0_0/core/org/apache/lucene/search/similarities/LMJelinekMercerSimilarity.html
-https://searchcode.com/codesearch/view/25295694/
-http://mkaz.com/2011/06/28/how-to-use-scala-and-lucene-to-create-a-basic-search-application/
-
-https://twitter.github.io/scala_school/concurrency.html
-
+##Miscellaneous
 
 Optimizations :
-- Stemming using a cache and done with all documents at once before processing
-- Compute collection frequency, collection frequencies sums, term frequency and term frequencies sums for all documents at once, storing them for later use instead of computing them each time
+- Stemming using a cache system to increase performance and space consumption
+- Compute collection frequency, collection frequencies sums, term frequency and term frequencies sums for all documents first (method "feed" in AScoring.scala) and compute score for specific query on demand afterwards (overriden method "getScore" in LanguageBasedScoring.scala and TermBasedScoring.scala)
+- For term frequency computation, logarithmic transformation and augmented term frequency have also been experimented (see TermBasedScoring.scala) but square root linear transformation have been prefered for performance / precision reasons
+- For Jelinek-Mercer smoothing, a lambda value of 0.1 have been chosen according to Chengxiang Zhai and John Lafferty, A Study of Smoothing Methods for Language Models Applied to Information Retrieval. (2004) ACM Transactions on Information Systems (TOIS)
 
+Run with VM arguments :
+-Xss200m
+-Xmx2048m
 
-TinyIR.jar :
+##Dependencies
 
-ch/ethz/dal/tinyir/
-            processing/
+Implemented and tested for Scala 2.11.2, JavaSE-1.7, jvm-1.6
+
+Library TinyIR.jar :
+ch.ethz.dal.tinyir.
+            processing.
                 StringDocument.scala
                 Document.scala
                 Tokenizer.scala
@@ -48,25 +57,26 @@ ch/ethz/dal/tinyir/
                 SaxParsing.scala
                 StopWords.scala
                 TipsterParse.scala
-            io/
+            io.
                 ZipDirStream.scala
                 DirStream.scala
                 ParsedXMLStream.scala
                 TipsterStream.scala
                 ZipStream.scala
                 DocStream.scala
-            lectures/
+            lectures.
                 PrecisionRecall.scala
                 TipsterGroundTruth.scala
-            alerts/
+            alerts.
                 AlertsTipster.scala
                 Alerts.scala
                 Query.scala
-            util/
+            util.
                 StopWatch.scala
-            indexing/
+            indexing.
                 FreqIndex.scala
                 SimpleIndex.scala
                 InvertedIndex.scala
 
-com/github/aztek/porterstemmer/PorterStemmer.scala
+Stemmer class :
+com.github.aztek.porterstemmer.PorterStemmer.scala

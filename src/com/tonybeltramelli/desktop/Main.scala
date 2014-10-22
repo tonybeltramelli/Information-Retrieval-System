@@ -20,9 +20,9 @@ object Main {
 		println(" <root path> <use language model> <only last 10 queries> <document number> <queries>(optional)\n")
 		println(" <root path> : String, path to the tipster folder\n")
 		println(" <use language model> : Boolean, true = language-based model / false = term-based model\n")
-		println(" <only last 10 queries> : Boolean\n")
+		println(" <only last 10 queries> : Boolean, true = only use the last test queries / false = use all the provided topics queries\n")
 		println(" <document number> : Int, number of document in the stream to process, -1 for all\n")
-		println(" <queries> : String, \"query1\" \"query2\" ... \"queryN\" / if not defined topics queries processed")
+		println(" <queries> : String, possibility to input custom queries such as \"query1\" \"query2\" ... \"queryN\" / if not defined the topics queries are used as input")
 		
 		System.exit(1)
 	  }
@@ -89,7 +89,7 @@ class Main
 	  
 	  val results = Helper.flipDimensions(scoringModel.getNames.map(n => (n, queriesTokens.map(q => (q._2, scoringModel.getScore(scoringModel.get(n), q._1))))))
 	  				.map(q => q._1 -> q._2.toList.sortBy(res => -res._2).take(Helper.RESULT_NUMBER))
-	  
+	  				
 	  Helper.time
 	  println("assess performances")
 	  

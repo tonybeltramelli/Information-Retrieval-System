@@ -27,4 +27,10 @@ class TermBasedScoring extends AScoring
 	{
 	  tf.mapValues(v => Math.sqrt(v) + Math.sqrt(v + 1))
 	}
+	
+	private def _getAugmentedTermFreq(tf : Map[String, Int]) : Map[String, Double] =
+	{
+		val max = tf.values.max.toDouble
+		tf.mapValues( f => 0.5 * f / max + 0.5 )
+	}
 }

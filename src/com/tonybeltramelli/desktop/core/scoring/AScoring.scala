@@ -16,8 +16,8 @@ trait AScoring
 	  
 	  _cfsSum += tfsSum
 	  tfs.filter(t => queries.map(q => q._1).exists(q => q.contains(t._1))).foreach(t => _cfs(t._1) = _cfs.get(t._1).getOrElse(0.0) + t._2)
-	
-	  _tfss += (documentName -> (tfs, tfsSum))
+	  
+	  if(queries.map(q => q._1.filter(w => tfs.contains(w))).map(q => q.size).sum > 0) _tfss += (documentName -> (tfs, tfsSum))
 	}
 
 	def getScore(f: (Map[String, Double], Double), query: List[String]) : Double
@@ -27,7 +27,7 @@ trait AScoring
 	  doc.groupBy(identity).mapValues(l => l.length)
 	}
 	
-	private def _getCollectionFreq(collection: Stream[(String, List[String])]) : Map[String, Double] =
+	private def _getCollectionFreq(collection: Stream[(String, List[String])]) =
 	{
 	  _getTermFreq(collection.flatMap(d => d._2).toList)
 	}
