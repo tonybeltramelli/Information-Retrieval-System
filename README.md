@@ -18,9 +18,9 @@ Usage:
 
 ##Architecture
 
-com.tonybeltramelli.desktop.
-    core.
-        perf.
+* com.tonybeltramelli.desktop.
+**    core.
+***        perf.
             PerformanceAssessor.scala : wrapper used to assess precision, recall and mean average precision
             PrecisionRecallAssessor.scala : extends ch.ethz.dal.tinyir.lectures.PrecisionRecall, used by PerformanceAssessor to assess performance
         scoring.
