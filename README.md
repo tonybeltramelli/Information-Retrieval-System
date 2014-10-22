@@ -9,7 +9,7 @@ Student project Autumn 2014 - [ETH Zurich](www.ethz.ch/en)
 ```bash
 Usage: 
  <root path> <use language model> <only last 10 queries> <document number> <queries>(optional)
- <root path> : String, path to the tipster folder
+ <root path> : String, path to the tipster data folder
  <use language model> : Boolean, true = language-based model / false = term-based model
  <only last 10 queries> : Boolean, true = only use the last test queries / false = use all the provided topics queries
  <document number> : Int, number of document in the stream to process, -1 for all
