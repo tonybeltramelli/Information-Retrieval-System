@@ -41,9 +41,9 @@ Optimizations :
 - For term frequency computation, logarithmic transformation and augmented term frequency have also been experimented (see TermBasedScoring.scala) but square root linear transformation have been prefered for performance / precision reasons
 - For Jelinek-Mercer smoothing, a lambda value of 0.1 have been chosen according to Chengxiang Zhai and John Lafferty, A Study of Smoothing Methods for Language Models Applied to Information Retrieval. (2004) ACM Transactions on Information Systems (TOIS)
 
-Run with VM arguments :
--Xss200m
--Xmx2048m
+Run with VM arguments :  
+-Xss200m  
+-Xmx2048m  
 
 ##Dependencies
 
