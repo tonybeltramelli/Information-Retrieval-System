@@ -54,6 +54,8 @@ class Main
 		  qu = topics.map(_._1)
 	  }
 	  
+	  println("search for " + qu.length + " queries : " + qu.mkString(", "))
+	  
 	  Helper.time
 	  println("tokenize and stem queries...")
 	  
