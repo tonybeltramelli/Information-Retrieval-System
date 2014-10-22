@@ -18,9 +18,10 @@ Usage:
 
 ##Architecture
 
-com.tonybeltramelli.desktop.  
-⋅⋅⋅ core.  
-⋅⋅⋅ ⋅⋅⋅ perf.  
+```
+com.tonybeltramelli.desktop.
+    core.
+        perf.
             PerformanceAssessor.scala : wrapper used to assess precision, recall and mean average precision
             PrecisionRecallAssessor.scala : extends ch.ethz.dal.tinyir.lectures.PrecisionRecall, used by PerformanceAssessor to assess performance
         scoring.
@@ -30,6 +31,7 @@ com.tonybeltramelli.desktop.
     util.
         Helper.scala : contains constants value and utils functions
     Main.scala : entry point, algorithm flow and topic loading
+```
 
 ##Miscellaneous
 
@@ -48,6 +50,7 @@ Run with VM arguments :
 Implemented and tested for Scala 2.11.2, JavaSE-1.7, jvm-1.6
 
 Library TinyIR.jar :
+```
 ch.ethz.dal.tinyir.
             processing.
                 StringDocument.scala
@@ -77,6 +80,9 @@ ch.ethz.dal.tinyir.
                 FreqIndex.scala
                 SimpleIndex.scala
                 InvertedIndex.scala
+```
 
 Stemmer class :
+```
 com.github.aztek.porterstemmer.PorterStemmer.scala
+```
