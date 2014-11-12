@@ -65,7 +65,7 @@ class Main
 	  println("get collection...")
 	  
 	  val collection = new TipsterStream(Helper.getPath(Helper.ZIP_PATH)).stream.take(if(documentNumber < 0) Int.MaxValue else documentNumber)
-
+	  
 	  Helper.time
 	  println("start processing...")
 	  
