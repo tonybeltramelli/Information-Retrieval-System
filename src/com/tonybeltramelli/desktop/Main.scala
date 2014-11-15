@@ -1,38 +1,49 @@
 package com.tonybeltramelli.desktop
 
-import ch.ethz.dal.classifier.processing.ReutersCorpusIterator
+import com.tonybeltramelli.desktop.util.Helper
+import com.tonybeltramelli.desktop.core.parser.Parser
+import com.tonybeltramelli.desktop.core.classifier.AClassifier
+import com.tonybeltramelli.desktop.core.classifier.LogisticRegression
+import com.tonybeltramelli.desktop.core.classifier.NaiveBayes
+import com.tonybeltramelli.desktop.core.classifier.SupportVectorMachines
 
 object Main
 {
   def main(args: Array[String])
   {
-    if (args.length != 1) {
+    if (args.length != 2) {
       System.exit(1)
     }
 
-    new Main(args(0).toString)
+    new Main(args(0).toString, args(1).toInt)
   }
 }
 
 class Main
 {
-  def this(path: String)
+  def this(rootPath: String, classifierNumber: Int)
   {
     this
-
-    val iter = new ReutersCorpusIterator(path)
-
-    val topicCounts = scala.collection.mutable.Map[String, Int]()
-    var count = 0;
-    while (iter.hasNext) {
-      val doc = iter.next
-      topicCounts ++= doc.topics.map(c => (c -> (1 + topicCounts.getOrElse(c, 0))))
-      count += 1
+    
+    Helper.setRootPath(rootPath)
+    
+    var classifier : AClassifier = null
+    
+    classifierNumber match
+    {
+      case 1 => classifier = new LogisticRegression
+      case 2 => classifier = new NaiveBayes
+      case 3 => classifier = new SupportVectorMachines
     }
+    
+    val parser : Parser = new Parser
 
-    for ((t, c) <- topicCounts)
-      println(t + ": " + c + " documents")
-
-    println(count + " docs in corpus")
+    Helper.time
+    println("parse training set...")
+    
+    parser.parseTrainingSet(classifier)
+    
+    println("script done")
+	Helper.time
   }
 }
