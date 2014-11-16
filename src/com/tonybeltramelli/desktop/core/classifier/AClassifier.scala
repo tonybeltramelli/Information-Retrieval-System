@@ -1,6 +1,8 @@
 package com.tonybeltramelli.desktop.core.classifier
 
 import scala.collection.mutable.{Map => MutMap}
+import com.tonybeltramelli.desktop.core.document.TrainingDocument
+import com.tonybeltramelli.desktop.util.Helper
 
 trait AClassifier
 {
@@ -9,7 +11,8 @@ trait AClassifier
   protected var _cfs : MutMap[String, Double] = MutMap() 
   protected var _cfsSum : Double = 0.0
   
-  var _documents : Map[String, (Map[String, Int], Set[String])] = Map() //documentName -> (termFreq, classCodes)
+  protected var _classToDoc : MutMap[String, Set[String]] = MutMap() // className -> documentNames
+  protected var _documents : MutMap[String, (Map[String, Int], Int)] = MutMap() // documentName -> (tfs, size)
 	
   def feed(documentName: String, document: List[String])
   {
@@ -21,10 +24,16 @@ trait AClassifier
 	_tfss += (documentName -> (tfs, tfsSum))
   }
   
-  def train(documentName: String, content: List[String], classCodes : Set[String])
+  def train(documentName: String, tokens: List[String], classCodes : Set[String])
   {
-    _documents += documentName -> (_getTermFreq(content), classCodes)
-    //maybe change to classCodes -> Map[documentName, termFreq]
+    for(c <- classCodes)
+    {
+      val cl = _classToDoc.getOrElseUpdate(c, Set[String]())  
+      _classToDoc.update(c, cl + documentName)      
+    }
+    
+    val content = Helper.stemTokens(tokens)
+    _documents.getOrElseUpdate(documentName, (_getTermFreq(content), content.length))
   }
 	
   private def _getTermFreq(doc: List[String]) =
