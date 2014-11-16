@@ -13,7 +13,6 @@ trait AClassifier
   
   protected var _classesToDoc : MutMap[String, Set[String]] = MutMap() // className -> documentNames
   protected var _documents : MutMap[String, (Map[String, Int], Int)] = MutMap() // documentName -> (tfs, size)
-   var _vocabulary : ListBuffer[String] = ListBuffer[String]()
 	
   /*def feed(documentName: String, document: List[String])
   {
@@ -35,19 +34,15 @@ trait AClassifier
     
     val content = Helper.stemTokens(tokens)
     _documents.getOrElseUpdate(documentName, (_getTermFreq(content), content.length))
-    
-    for(word <- content)
-    {
-      if(!_vocabulary.contains(word)) _vocabulary += word
-    }
   }
   
-  def apply
+  def apply(document: List[String]) =
   {
     //to be overridden
+    ""
   }
 	
-  private def _getTermFreq(doc: List[String]) =
+  protected def _getTermFreq(doc: List[String]) =
   {
     doc.groupBy(identity).mapValues(l => l.length)
   }

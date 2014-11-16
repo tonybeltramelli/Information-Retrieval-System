@@ -21,29 +21,43 @@ object Main
 
 class Main
 {
+  private var _classifier : AClassifier = null
+  private val _parser : Parser = new Parser
+  
   def this(rootPath: String, classifierNumber: Int)
   {
     this
     
     Helper.setRootPath(rootPath)
     
-    var classifier : AClassifier = null
-    
     classifierNumber match
     {
-      case 1 => classifier = new LogisticRegression
-      case 2 => classifier = new NaiveBayes
-      case 3 => classifier = new SupportVectorMachines
+      case 1 => _classifier = new LogisticRegression
+      case 2 => _classifier = new NaiveBayes
+      case 3 => _classifier = new SupportVectorMachines
     }
-    
-    val parser : Parser = new Parser
 
     Helper.time
     println("parse training set...")
+
+    _parser.parse(Helper.TRAIN, train)
     
-    parser.parseTrainingSet(classifier)
+    Helper.time
+    println("parse testing set...")
+
+    _parser.parse(Helper.TEST_WITH_LABELS, test)
     
     println("script done")
 	Helper.time
+  }
+  
+  def train
+  {
+    _classifier.train(_parser.doc.name, _parser.doc.tokens, _parser.doc.topics)
+  }
+  
+  def test
+  {
+    println(_parser.doc.name + " -> " + _classifier.apply(_parser.doc.tokens) + " " + _parser.doc.topics)
   }
 }

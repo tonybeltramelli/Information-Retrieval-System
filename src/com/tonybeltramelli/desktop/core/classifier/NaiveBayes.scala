@@ -1,32 +1,9 @@
 package com.tonybeltramelli.desktop.core.classifier
 
+import com.tonybeltramelli.desktop.util.Helper
+
 class NaiveBayes extends AClassifier
 {  
-  
-  def apply(document: List[String]) =
-  {
-    var max = 0.0
-    var result = ""
-    
-    for(classToDoc <- _classesToDoc)
-    {
-      var prob = getProbClass(classToDoc._1)
-      
-      for(term <- document)
-      {
-        prob += getProbWordClass(term, classToDoc._1)
-      }
-      
-      if(prob > max)
-      {
-        result = classToDoc._1
-        max = prob
-      }
-    }
-    
-    result
-  }
-  
   def getProbClass(className: String) =
   {
     _classesToDoc(className).size / _documents.size.toDouble
@@ -47,5 +24,29 @@ class NaiveBayes extends AClassifier
     }
     
     sumTf / sumDocSize.toDouble
+  }
+  
+  override def apply(document: List[String]) =
+  {
+    var max = 0.0
+    var result = ""
+    
+    for(classToDoc <- _classesToDoc)
+    {
+      var prob = getProbClass(classToDoc._1)
+      
+      for(term <- Helper.stemTokens(document))
+      {
+        prob += getProbWordClass(term, classToDoc._1)
+      }
+      
+      if(prob > max)
+      {
+        result = classToDoc._1
+        max = prob
+      }
+    }
+    
+    result
   }
 }
