@@ -1,10 +1,35 @@
 package com.tonybeltramelli.desktop.core.classifier
 
-class NaiveBayes extends AClassifier {
+class NaiveBayes extends AClassifier
+{  
+  
+  def apply(document: List[String]) =
+  {
+    var max = 0.0
+    var result = ""
+    
+    for(classToDoc <- _classesToDoc)
+    {
+      var prob = getProbClass(classToDoc._1)
+      
+      for(term <- document)
+      {
+        prob += getProbWordClass(term, classToDoc._1)
+      }
+      
+      if(prob > max)
+      {
+        result = classToDoc._1
+        max = prob
+      }
+    }
+    
+    result
+  }
   
   def getProbClass(className: String) =
   {
-    _classToDoc(className).size / _documents.size.toDouble
+    _classesToDoc(className).size / _documents.size.toDouble
   }
   
   def getProbWordClass(word: String, className: String) =
@@ -15,9 +40,9 @@ class NaiveBayes extends AClassifier {
     //Laplace smoothing
     val alpha = 1
     
-    for(docName <- _classToDoc(className))
+    for(docName <- _classesToDoc(className))
     {
-      sumTf += _documents(docName)._1.getOrElse(word, alpha)
+      sumTf += _documents(docName)._1.getOrElse(word, 0) + alpha
       sumDocSize += _documents(docName)._2 + (alpha * _documents(docName)._1.size)
     }
     
