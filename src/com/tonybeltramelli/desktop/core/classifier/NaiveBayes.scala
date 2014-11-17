@@ -58,7 +58,7 @@ class NaiveBayes extends AClassifier
   {  
     if(_cacheVocabularySize == 0)
     {
-      _cacheVocabularySize = _documents.flatMap(_._1).map(f => f._1).distinct.length
+      _cacheVocabularySize = _documents.flatMap(d => d._2._1).map(f => f._1).size
     }
     
     _cacheVocabularySize
