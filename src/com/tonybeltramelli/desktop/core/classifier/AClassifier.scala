@@ -12,7 +12,7 @@ trait AClassifier
   protected var _cfsSum : Double = 0.0
   
   protected var _classesToDoc : MutMap[String, Set[Int]] = MutMap() // className -> documentIndexes
-  protected var _documents : MutMap[Int, (Map[String, Int], Int, String)] = MutMap() // documentIndex -> (tfs, size)
+  protected var _documents : MutMap[Int, (Map[String, Int], Int)] = MutMap() // documentIndex -> (tfs, size)
 	
   /*def feed(documentName: String, document: List[String])
   {
@@ -29,7 +29,7 @@ trait AClassifier
   def train(documentName: String, tokens: List[String], classCodes : Set[String])
   {
     val content = Helper.stemTokens(tokens)
-    _documents += counter -> (_getTermFreq(content), content.length, documentName)
+    _documents += counter -> (_getTermFreq(content), content.length)
     
     for(c <- classCodes)
     {
@@ -38,21 +38,6 @@ trait AClassifier
     }
     
     counter += 1
-  }
-  
-  def verify
-  {
-    
-    //val d1 = _classesToDoc("M14").map(i => _documents(i)._1) //675521
-    
-    //println(d1)
-    //println(_classesToDoc("M14"))
-    //println(_documents.flatMap(d => d._2._1).map(f => f._1).size)
-    
-    val d1 = _classesToDoc("M14").map(i => _documents(i)._3) //675521
-    
-    println(d1)
-    
   }
   
   def apply(document: List[String]) =

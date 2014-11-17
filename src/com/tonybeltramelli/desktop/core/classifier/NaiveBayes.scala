@@ -22,7 +22,7 @@ class NaiveBayes extends AClassifier
       val doc = _documents(docIndex)
       
       sumTf += doc._1.getOrElse(word, 0) + alpha
-      sumDocSize += doc._2 + (alpha * doc._1.size)
+      sumDocSize += doc._2 + (alpha * _vocabularySize)
     }
     
     sumTf / sumDocSize.toDouble
@@ -30,16 +30,16 @@ class NaiveBayes extends AClassifier
   
   override def apply(document: List[String]) =
   {
-    var max = 0.0
+    var max = Double.MinValue 
     var result = ""
     
     for(classToDoc <- _classesToDoc)
     {
-      var prob = getProbClass(classToDoc._1)
+      var prob = Math.log(getProbClass(classToDoc._1))
       
       for(term <- Helper.stemTokens(document))
       {
-        prob += getProbWordClass(term, classToDoc._1)
+        prob += Math.log(getProbWordClass(term, classToDoc._1))
       }
       
       if(prob > max)

@@ -46,19 +46,16 @@ class Main
     }
     
     _parser.documentNumber = if(documentNumber != -1) documentNumber else Int.MaxValue
-
+    
     Helper.time
     println("parse training set...")
 
     _parser.parse(Helper.TRAIN, train)
     
-    _classifier.verify
-    
-    /*
     Helper.time
     println("parse testing set...")
 
-    _parser.parse(Helper.TEST_WITH_LABELS, test)*/
+    _parser.parse(Helper.TEST_WITH_LABELS, test)
     
     println("script done")
 	Helper.time
