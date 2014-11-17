@@ -36,6 +36,11 @@ trait AClassifier
     _documents.getOrElseUpdate(documentName, (_getTermFreq(content), content.length))
   }
   
+  def countVocabulary
+  {  
+    println(_documents.flatMap(d => d._2._1).map(f => f._1).size)
+  }
+  
   def apply(document: List[String]) =
   {
     //to be overridden
