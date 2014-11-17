@@ -17,10 +17,12 @@ class NaiveBayes extends AClassifier
     //Laplace smoothing
     val alpha = 1
     
-    for(docName <- _classesToDoc(className))
+    for(docIndex <- _classesToDoc(className))
     {
-      sumTf += _documents(docName)._1.getOrElse(word, 0) + alpha
-      sumDocSize += _documents(docName)._2 + (alpha * _documents(docName)._1.size)
+      val doc = _documents(docIndex)
+      
+      sumTf += doc._1.getOrElse(word, 0) + alpha
+      sumDocSize += doc._2 + (alpha * doc._1.size)
     }
     
     sumTf / sumDocSize.toDouble
@@ -48,5 +50,17 @@ class NaiveBayes extends AClassifier
     }
     
     result
+  }
+  
+  private var _cacheVocabularySize = 0
+  
+  private def _vocabularySize = 
+  {  
+    if(_cacheVocabularySize == 0)
+    {
+      _cacheVocabularySize = _documents.flatMap(_._1).map(f => f._1).distinct.length
+    }
+    
+    _cacheVocabularySize
   }
 }

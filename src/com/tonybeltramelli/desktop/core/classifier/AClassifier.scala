@@ -11,8 +11,8 @@ trait AClassifier
   protected var _cfs : MutMap[String, Double] = MutMap() 
   protected var _cfsSum : Double = 0.0
   
-  protected var _classesToDoc : MutMap[String, Set[String]] = MutMap() // className -> documentNames
-  protected var _documents : MutMap[String, (Map[String, Int], Int)] = MutMap() // documentName -> (tfs, size)
+  protected var _classesToDoc : MutMap[String, Set[Int]] = MutMap() // className -> documentIndexes
+  protected var _documents : ListBuffer[(Map[String, Int], Int)] = ListBuffer() // documentIndex -> (tfs, size)
 	
   /*def feed(documentName: String, document: List[String])
   {
@@ -25,20 +25,15 @@ trait AClassifier
   }*/
   
   def train(documentName: String, tokens: List[String], classCodes : Set[String])
-  {
+  {    
+    val content = Helper.stemTokens(tokens)
+    _documents.append((_getTermFreq(content), content.length))
+    
     for(c <- classCodes)
     {
-      val cl = _classesToDoc.getOrElseUpdate(c, Set[String]())  
-      _classesToDoc.update(c, cl + documentName)      
+      val cl = _classesToDoc.getOrElseUpdate(c, Set[Int]())  
+      _classesToDoc.update(c, cl + (_documents.length - 1))      
     }
-    
-    val content = Helper.stemTokens(tokens)
-    _documents.getOrElseUpdate(documentName, (_getTermFreq(content), content.length))
-  }
-  
-  def countVocabulary
-  {  
-    println(_documents.flatMap(d => d._2._1).map(f => f._1).size)
   }
   
   def apply(document: List[String]) =

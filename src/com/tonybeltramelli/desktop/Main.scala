@@ -52,16 +52,10 @@ class Main
 
     _parser.parse(Helper.TRAIN, train)
     
-    _classifier.countVocabulary
-    
-    /*
     Helper.time
     println("parse testing set...")
 
     _parser.parse(Helper.TEST_WITH_LABELS, test)
-    */
-    
-    println(vocabulary.length + " / " + vocabulary.distinct.length)
     
     println("script done")
 	Helper.time
