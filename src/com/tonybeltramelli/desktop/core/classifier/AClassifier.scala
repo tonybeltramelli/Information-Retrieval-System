@@ -11,7 +11,7 @@ trait AClassifier
   protected var _cfs : MutMap[String, Double] = MutMap() 
   protected var _cfsSum : Double = 0.0
   
-  protected var _classesToDoc : MutMap[String, Set[Int]] = MutMap() // className -> documentIndexes
+  protected var _classesToDoc : MutMap[String, List[Int]] = MutMap() // className -> documentIndexes
   protected var _documents : MutMap[Int, (Map[String, Int], Int)] = MutMap() // documentIndex -> (tfs, size)
 	
   /*def feed(documentName: String, document: List[String])
@@ -33,8 +33,8 @@ trait AClassifier
     
     for(c <- classCodes)
     {
-      val cl = _classesToDoc.getOrElseUpdate(c, Set[Int]())  
-      _classesToDoc.update(c, cl + counter)      
+      val cl = _classesToDoc.getOrElseUpdate(c, List[Int]())  
+      _classesToDoc.update(c, cl :+ counter)      
     }
     
     counter += 1

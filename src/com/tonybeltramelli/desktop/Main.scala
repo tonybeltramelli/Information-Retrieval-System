@@ -86,6 +86,6 @@ class Main
   
   def test
   {
-    println(_parser.doc.name + " -> " + _classifier.apply(_parser.doc.tokens) + " " + _parser.doc.topics)
+    //println(_parser.doc.name + " -> " + _classifier.apply(_parser.doc.tokens) + " " + _parser.doc.topics)
   }
 }
