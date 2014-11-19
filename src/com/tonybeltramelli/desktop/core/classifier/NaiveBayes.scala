@@ -49,7 +49,7 @@ class NaiveBayes extends AClassifier
       }
     }
     
-    result
+    Set(result)
   }
   
   private var _cacheVocabularySize = 0

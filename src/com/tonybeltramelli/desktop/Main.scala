@@ -7,6 +7,7 @@ import com.tonybeltramelli.desktop.core.classifier.LogisticRegression
 import com.tonybeltramelli.desktop.core.classifier.NaiveBayes
 import com.tonybeltramelli.desktop.core.classifier.SupportVectorMachines
 import scala.collection.mutable.ListBuffer
+import com.tonybeltramelli.desktop.core.perf.Relevance
 
 object Main
 {
@@ -31,6 +32,8 @@ class Main
 {
   private var _classifier : AClassifier = null
   private val _parser : Parser = new Parser
+  private val _relevance : Relevance = new Relevance
+  private var _results : String = ""
   
   def this(rootPath: String, classifierNumber: Int, documentNumber: Int)
   {
@@ -53,30 +56,26 @@ class Main
     _parser.parse(Helper.TRAIN, train)
     
     Helper.time
-    println("parse testing set...")
+    println("parse labelled testing set...")
 
-    _parser.parse(Helper.TEST_WITH_LABELS, test)
+    _relevance.reset
+    
+    _parser.parse(Helper.TEST_WITH_LABELS, labelledTest)
+        
+    Helper.printToFile(_results, classifierNumber, true)
+    
+    println("total relevance : " + _relevance.totalPrecision + " " + _relevance.totalRecall + " " + _relevance.totalF1Score)
+    
+    Helper.time
+    println("parse unlabelled testing set...")
+    
+    _results = ""
+    _parser.parse(Helper.TEST_WITHOUT_LABELS , unlabelledTest)
+        
+    Helper.printToFile(_results, classifierNumber, false)
     
     println("script done")
 	Helper.time
-  }
-  
-  val vocabulary : ListBuffer[String] = ListBuffer[String]()
-  val cache : ListBuffer[String] = ListBuffer[String]()
-  val CACHE_SIZE = 100
-  
-  def countVoc
-  {
-    for(term <- Helper.stemTokens(_parser.doc.tokens))
-    {
-      if(cache.size > CACHE_SIZE) cache.clear
-      
-      if(!cache.contains(term))
-      {
-        cache += term
-        vocabulary += term
-      }
-    }
   }
   
   def train
@@ -84,8 +83,19 @@ class Main
     _classifier.train(_parser.doc.name, _parser.doc.tokens, _parser.doc.topics)
   }
   
-  def test
+  def labelledTest
   {
-    //println(_parser.doc.name + " -> " + _classifier.apply(_parser.doc.tokens) + " " + _parser.doc.topics)
+    val retrieved = _classifier.apply(_parser.doc.tokens)
+    val expected = _parser.doc.topics
+    
+    val relevance = _relevance.assess(retrieved, expected)
+    
+    val res = relevance._1 + " " + relevance._2 + " " + relevance._3 + "\n" + _parser.doc.name + " " + retrieved.mkString(" ") + "\n"
+    _results += res
+  }
+  
+  def unlabelledTest
+  {
+    _results += _parser.doc.name + " " + _classifier.apply(_parser.doc.tokens).mkString(" ") + "\n"
   }
 }

@@ -15,7 +15,7 @@ object Helper {
   val TEST_WITHOUT_LABELS = "/test-without-labels"
   val TRAIN = "/train"
     
-  val OUTPUT_FILE = "/output/ranking-M-tony-beltramelli.run"
+  val OUTPUT_FILE = "/output/classify-tony-beltramelli-M-C.run"
   
   val RESULT_NUMBER = 100
   var TOKEN_MAX_SIZE = 100000
@@ -70,14 +70,22 @@ object Helper {
     flatten.groupBy(_._1).mapValues(_.map(_.tail))
   }
   
-  def printToFile(results : Map[Int, List[(String, Double)]], topics : List[(String, Int)], useLanguageModel : Boolean)
+  def printToFile(results: String, classifierNumber: Int, isLabeled : Boolean)
   {
-    val file = new File(_rootPath + OUTPUT_FILE.replace('M', if(useLanguageModel) 'l' else 't'))
+    var c = ""
+    classifierNumber match
+    {
+      case 1 => c = "lr"
+      case 2 => c = "nb"
+      case 3 => c = "svm"
+    }
+    
+    val file = new File(_rootPath + OUTPUT_FILE.replace('M', if(isLabeled) 'l' else 'u').replace("C", c))
     file.getParentFile.mkdirs
     
     val fw = new FileWriter(file)
     
-    results.foreach(r => r._2.zipWithIndex.foreach{case(l, i) => fw.write(topics(r._1)._2.toString + " " + (i + 1) + " " + l._1 + "\n")})
+    fw.write(results)
     
     fw.close
   }

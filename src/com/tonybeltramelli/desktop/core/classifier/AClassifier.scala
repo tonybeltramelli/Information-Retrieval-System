@@ -43,7 +43,7 @@ trait AClassifier
   def apply(document: List[String]) =
   {
     //to be overridden
-    ""
+    Set("")
   }
 	
   protected def _getTermFreq(doc: List[String]) =
