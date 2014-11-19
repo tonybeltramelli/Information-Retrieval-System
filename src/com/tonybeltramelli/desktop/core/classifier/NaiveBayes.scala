@@ -3,7 +3,21 @@ package com.tonybeltramelli.desktop.core.classifier
 import com.tonybeltramelli.desktop.util.Helper
 
 class NaiveBayes extends AClassifier
-{  
+{
+  override def train(documentName: String, tokens: List[String], classCodes : Set[String])
+  {
+    val content = Helper.stemTokens(tokens)
+    _documents += _documentCounter -> (_getTermFreq(content), content.length)
+    
+    for(c <- classCodes)
+    {
+      val cl = _classesToDoc.getOrElseUpdate(c, List[Int]())  
+      _classesToDoc.update(c, cl :+ _documentCounter)      
+    }
+    
+    _documentCounter += 1
+  }
+  
   def getProbClass(className: String) =
   {
     _classesToDoc(className).size / _documents.size.toDouble

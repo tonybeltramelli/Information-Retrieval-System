@@ -2,15 +2,19 @@ package com.tonybeltramelli.desktop.core.perf
 
 class Relevance
 {
-  var totalPrecision = 0.0
-  var totalRecall = 0.0
-  var totalF1Score = 0.0
+  private var _documentNumber = 0.0
+
+  private var _totalPrecision = 0.0
+  private var _totalRecall = 0.0
+  private var _totalF1Score = 0.0
   
   def reset
   {
-    totalPrecision = 0.0
-    totalRecall = 0.0
-    totalF1Score = 0.0
+    _totalPrecision = 0.0
+    _totalRecall = 0.0
+    _totalF1Score = 0.0
+    
+    _documentNumber = 0.0
   }
   
   def assess(retrievedTopics: Set[String], expecedTopics: Set[String]) =
@@ -25,10 +29,14 @@ class Relevance
     
     val f1Score = 2 * (precision * recall) / (if(precision + recall == 0) 1 else (precision + recall))
     
-    totalPrecision += precision
-    totalRecall += recall
-    totalF1Score += f1Score
+    _totalPrecision += precision
+    _totalRecall += recall
+    _totalF1Score += f1Score
+    
+    _documentNumber += 1
     
     (precision, recall, f1Score)
   }
+  
+  def totalAverageRelevance = (_totalPrecision / _documentNumber, _totalRecall / _documentNumber, _totalF1Score / _documentNumber)
 }

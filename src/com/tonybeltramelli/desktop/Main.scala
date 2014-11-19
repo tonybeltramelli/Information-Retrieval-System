@@ -61,10 +61,12 @@ class Main
     _relevance.reset
     
     _parser.parse(Helper.TEST_WITH_LABELS, labelledTest)
-        
+    
+    _results = _relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3 + "\n" + _results
+    
     Helper.printToFile(_results, classifierNumber, true)
     
-    println("total relevance : " + _relevance.totalPrecision + " " + _relevance.totalRecall + " " + _relevance.totalF1Score)
+    println("total relevance : " + _relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3)
     
     Helper.time
     println("parse unlabelled testing set...")
@@ -90,7 +92,9 @@ class Main
     
     val relevance = _relevance.assess(retrieved, expected)
     
-    val res = relevance._1 + " " + relevance._2 + " " + relevance._3 + "\n" + _parser.doc.name + " " + retrieved.mkString(" ") + "\n"
+    //println(_parser.doc.name + " : " + relevance._1 + " " + relevance._2 + " " + relevance._3)
+    
+    val res = _parser.doc.name + " " + retrieved.mkString(" ") + "\n"
     _results += res
   }
   
