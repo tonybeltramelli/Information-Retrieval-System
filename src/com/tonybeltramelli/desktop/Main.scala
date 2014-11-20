@@ -9,6 +9,7 @@ import com.tonybeltramelli.desktop.core.classifier.SupportVectorMachines
 import scala.collection.mutable.ListBuffer
 import com.tonybeltramelli.desktop.core.perf.Relevance
 import com.tonybeltramelli.desktop.util.Printer
+import scala.collection.immutable.ListMap
 
 object Main
 {
@@ -24,7 +25,7 @@ object Main
       	
       System.exit(1)
     }
-
+    
     new Main(args(0).toString, args(1).toInt, args(2).toInt)
   }
 }
@@ -55,6 +56,10 @@ class Main
     println("parse training set...")
 
     _parser.parse(Helper.TRAIN, preprocess)
+    
+    Helper.time
+    println("train classifiers...")
+    
     _classifier.trainAll
     
     Helper.time

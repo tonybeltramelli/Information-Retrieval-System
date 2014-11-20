@@ -6,7 +6,7 @@ import scala.collection.mutable.ListBuffer
 class LogisticRegression extends AClassifier
 {
   private val _classifiers: MutMap[String, BinaryClassifierLR] = MutMap() //class name -> binary classifier
-  private val _documentFreq : MutMap[String, Int] = MutMap()
+  private val _THRESHOLD = 0.9
   
   override def train(topic: String)
   {
@@ -22,40 +22,13 @@ class LogisticRegression extends AClassifier
     _classifiers += topic -> bc
   }
   
-  def trains(documentName: String, tokens: List[String], classCodes : Set[String])
-  {
-    //_updateDocumentFreq(tokens)
-    
-    val documentFeatures = _getDocumentFeatures(tokens)
-    
-    _documentCounter += 1
-  }
-  
   override def apply(tokens: List[String]) =
   {
-    var results : Set[String] = Set()
-    val documentFeatures = _getDocumentFeatures(tokens)
+    val documentFeatures = _getTermFreq(tokens).map(f => f._2.toDouble).toArray
     
-    for(bc <- _classifiers)
-    {
-      val p = bc._2.getProb(documentFeatures)
-      
-      if(p >= 0.5) results = results + bc._1
-    }
+    val results = _classifiers.map(bc => (bc._1, bc._2.getProb(documentFeatures))).filter(_._2 >= _THRESHOLD).toSeq.sortWith(_._2 > _._2)
     
-    results
-  }
-  
-  private def _getDocumentFeatures(document: List[String]) = _getTermFreq(document).map(f => f._2.toDouble).toArray
-  
-  private def _getInverseDocumentFreq(df: Map[String, Int], documentNumber: Int) =
-  {
-    df.mapValues(Math.log(documentNumber) - Math.log(_))
-  }
-  
-  private def _updateDocumentFreq(document: List[String]) =
-  {
-    _documentFreq ++= document.distinct.map(t => t -> (1 + _documentFreq.getOrElse(t, 0)))
+    results.map(_._1).toSet
   }
   
   class BinaryClassifierLR
