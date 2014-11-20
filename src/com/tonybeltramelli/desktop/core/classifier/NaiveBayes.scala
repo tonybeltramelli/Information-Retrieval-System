@@ -18,10 +18,7 @@ class NaiveBayes extends AClassifier
     _documentCounter += 1
   }
   
-  def getProbClass(className: String) =
-  {
-    _classesToDoc(className).size / _documents.size.toDouble
-  }
+  def getProbClass(className: String) = _classesToDoc(className).size / _documents.size.toDouble
   
   def getProbWordClass(word: String, className: String) =
   {
@@ -46,12 +43,13 @@ class NaiveBayes extends AClassifier
   {
     var max = Double.MinValue 
     var result = ""
+    var content = Helper.stemTokens(document)
     
-    for(classToDoc <- _classesToDoc)
+    for(classToDoc <- _classesToDoc.par)
     {
       var prob = Math.log(getProbClass(classToDoc._1))
       
-      for(term <- Helper.stemTokens(document))
+      for(term <- content)
       {
         prob += Math.log(getProbWordClass(term, classToDoc._1))
       }

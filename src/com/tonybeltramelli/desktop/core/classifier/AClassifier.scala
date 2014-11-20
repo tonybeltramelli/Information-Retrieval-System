@@ -26,6 +26,35 @@ trait AClassifier
 	_tfss += (documentName -> (tfs, tfsSum))
   }*/
   
+  def preprocess(tokens: List[String], classCodes : Set[String])
+  {
+    val content = Helper.stemTokens(tokens)
+    _documents += _documentCounter -> (_getTermFreq(content), content.length)
+    
+    for(c <- classCodes)
+    {
+      val cl = _classesToDoc.getOrElseUpdate(c, List[Int]())  
+      _classesToDoc.update(c, cl :+ _documentCounter)      
+    }
+    
+    _documentCounter += 1
+  }
+  
+  def trainAll
+  {
+    for(classToDoc <- _classesToDoc.par)
+    {
+      val topic = classToDoc._1
+      
+      for(docIndex <- _classesToDoc(topic))
+      {
+    	  val doc = _documents(docIndex)
+    	  
+    	  //train()
+      } 
+    }
+  }
+  
   def train(documentName: String, tokens: List[String], classCodes : Set[String])
   {
     //to be overridden

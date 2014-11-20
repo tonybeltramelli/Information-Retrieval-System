@@ -8,6 +8,7 @@ import com.tonybeltramelli.desktop.core.classifier.NaiveBayes
 import com.tonybeltramelli.desktop.core.classifier.SupportVectorMachines
 import scala.collection.mutable.ListBuffer
 import com.tonybeltramelli.desktop.core.perf.Relevance
+import com.tonybeltramelli.desktop.util.Printer
 
 object Main
 {
@@ -33,7 +34,7 @@ class Main
   private var _classifier : AClassifier = null
   private val _parser : Parser = new Parser
   private val _relevance : Relevance = new Relevance
-  private var _results : String = ""
+  private var _printer : Printer = null
   
   def this(rootPath: String, classifierNumber: Int, documentNumber: Int)
   {
@@ -58,24 +59,23 @@ class Main
     Helper.time
     println("parse labelled testing set...")
 
+    _printer = new Printer(Helper.getResource(Helper.OUTPUT_FILE), classifierNumber)
+
     _relevance.reset
-    
     _parser.parse(Helper.TEST_WITH_LABELS, labelledTest)
-    
-    _results = _relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3 + "\n" + _results
-    
-    Helper.printToFile(_results, classifierNumber, true)
+        
+    _printer.save
+    _printer.prepend(_relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3 + "\n", true)
     
     println("total relevance : " + _relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3)
     
     Helper.time
     println("parse unlabelled testing set...")
     
-    _results = ""
     _parser.parse(Helper.TEST_WITHOUT_LABELS , unlabelledTest)
-        
-    Helper.printToFile(_results, classifierNumber, false)
     
+    _printer.save
+        
     println("script done")
 	Helper.time
   }
@@ -94,12 +94,12 @@ class Main
     
     //println(_parser.doc.name + " : " + relevance._1 + " " + relevance._2 + " " + relevance._3)
     
-    val res = _parser.doc.name + " " + retrieved.mkString(" ") + "\n"
-    _results += res
+    val results = _parser.doc.name + " " + retrieved.mkString(" ") + "\n"
+    _printer.print(results, true)
   }
   
   def unlabelledTest
   {
-    _results += _parser.doc.name + " " + _classifier.apply(_parser.doc.tokens).mkString(" ") + "\n"
+    _printer.print(_parser.doc.name + " " + _classifier.apply(_parser.doc.tokens).mkString(" ") + "\n", false)
   }
 }

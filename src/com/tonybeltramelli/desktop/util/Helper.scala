@@ -5,6 +5,7 @@ import com.github.aztek.porterstemmer.PorterStemmer
 import scala.collection.mutable.Iterable
 import java.io.File
 import java.io.FileWriter
+import java.io.BufferedWriter
 
 class Helper {
 }
@@ -15,7 +16,7 @@ object Helper {
   val TEST_WITHOUT_LABELS = "/test-without-labels"
   val TRAIN = "/train"
     
-  val OUTPUT_FILE = "/output/classify-tony-beltramelli-M-C.run"
+  val OUTPUT_FILE = "/output/classify-tony-beltramelli-{M}-{C}.run"
   
   val RESULT_NUMBER = 100
   var TOKEN_MAX_SIZE = 100000
@@ -68,25 +69,5 @@ object Helper {
     }
 	
     flatten.groupBy(_._1).mapValues(_.map(_.tail))
-  }
-  
-  def printToFile(results: String, classifierNumber: Int, isLabeled : Boolean)
-  {
-    var c = ""
-    classifierNumber match
-    {
-      case 1 => c = "lr"
-      case 2 => c = "nb"
-      case 3 => c = "svm"
-    }
-    
-    val file = new File(_rootPath + OUTPUT_FILE.replace('M', if(isLabeled) 'l' else 'u').replace("C", c))
-    file.getParentFile.mkdirs
-    
-    val fw = new FileWriter(file)
-    
-    fw.write(results)
-    
-    fw.close
   }
 }
