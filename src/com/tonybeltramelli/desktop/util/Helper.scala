@@ -19,7 +19,7 @@ object Helper {
   val OUTPUT_FILE = "/output/classify-tony-beltramelli-{M}-{C}.run"
   
   val RESULT_NUMBER = 100
-  var TOKEN_MAX_SIZE = 100000
+  val TOKEN_MAX_SIZE = 100000
 
   val IS_DEBUG_MODE: Boolean = false
 

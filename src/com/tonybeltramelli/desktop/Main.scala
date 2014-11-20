@@ -54,7 +54,8 @@ class Main
     Helper.time
     println("parse training set...")
 
-    _parser.parse(Helper.TRAIN, train)
+    _parser.parse(Helper.TRAIN, preprocess)
+    _classifier.trainAll
     
     Helper.time
     println("parse labelled testing set...")
@@ -80,14 +81,14 @@ class Main
 	Helper.time
   }
   
-  def train
+  def preprocess
   {
-    _classifier.train(_parser.doc.name, _parser.doc.tokens, _parser.doc.topics)
+    _classifier.preprocess(Helper.stemTokens(_parser.doc.tokens), _parser.doc.topics)
   }
   
   def labelledTest
   {
-    val retrieved = _classifier.apply(_parser.doc.tokens)
+    val retrieved = _classifier.apply(Helper.stemTokens(_parser.doc.tokens))
     val expected = _parser.doc.topics
     
     val relevance = _relevance.assess(retrieved, expected)

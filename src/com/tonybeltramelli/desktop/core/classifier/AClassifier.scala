@@ -1,35 +1,18 @@
 package com.tonybeltramelli.desktop.core.classifier
 
 import scala.collection.mutable.{Map => MutMap}
-import com.tonybeltramelli.desktop.util.Helper
 import scala.collection.mutable.ListBuffer
 
 trait AClassifier
 {
-  protected var _tfss : MutMap[String, (Map[String, Int], Int)] = MutMap[String, (Map[String, Int], Int)]()
-	
-  protected var _cfs : MutMap[String, Double] = MutMap() 
-  protected var _cfsSum : Double = 0.0
-  
   protected val _classesToDoc : MutMap[String, List[Int]] = MutMap() // className -> documentIndexes
   protected val _documents : MutMap[Int, (Map[String, Int], Int)] = MutMap() // documentIndex -> (tfs, size)
 	
   protected var _documentCounter = 0
   
-  /*def feed(documentName: String, document: List[String])
-  {
-    val tfs = _getTermFreq(document)
-    val tfsSum = tfs.map(v => v._2).sum
-    
-    _cfsSum += tfsSum
-	  
-	_tfss += (documentName -> (tfs, tfsSum))
-  }*/
-  
   def preprocess(tokens: List[String], classCodes : Set[String])
   {
-    val content = Helper.stemTokens(tokens)
-    _documents += _documentCounter -> (_getTermFreq(content), content.length)
+    _documents += _documentCounter -> (_getTermFreq(tokens), tokens.length)
     
     for(c <- classCodes)
     {
@@ -44,23 +27,16 @@ trait AClassifier
   {
     for(classToDoc <- _classesToDoc.par)
     {
-      val topic = classToDoc._1
-      
-      for(docIndex <- _classesToDoc(topic))
-      {
-    	  val doc = _documents(docIndex)
-    	  
-    	  //train()
-      } 
+      train(classToDoc._1)
     }
   }
   
-  def train(documentName: String, tokens: List[String], classCodes : Set[String])
+  def train(topic: String)
   {
     //to be overridden
   }
   
-  def apply(document: List[String]) =
+  def apply(tokens: List[String]) =
   {
     //to be overridden
     Set("")
@@ -75,7 +51,4 @@ trait AClassifier
   {
     _getTermFreq(collection.flatMap(d => d._2).toList)
   }
-	
-  def get = _tfss
-  def getNames = {_tfss.map(f =>  f._1)}
 }

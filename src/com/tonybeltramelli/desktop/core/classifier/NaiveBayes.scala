@@ -1,26 +1,29 @@
 package com.tonybeltramelli.desktop.core.classifier
 
-import com.tonybeltramelli.desktop.util.Helper
+import scala.collection.mutable.{Map => MutMap}
 
 class NaiveBayes extends AClassifier
 {
-  override def train(documentName: String, tokens: List[String], classCodes : Set[String])
+  protected val _classesProb : MutMap[String, Double] = MutMap() // className -> documentIndexes
+  
+  override def train(topic: String)
   {
-    val content = Helper.stemTokens(tokens)
-    _documents += _documentCounter -> (_getTermFreq(content), content.length)
-    
-    for(c <- classCodes)
-    {
-      val cl = _classesToDoc.getOrElseUpdate(c, List[Int]())  
-      _classesToDoc.update(c, cl :+ _documentCounter)      
-    }
-    
-    _documentCounter += 1
+    _classesProb += topic -> Math.log(_getProbClass(topic))
   }
   
-  def getProbClass(className: String) = _classesToDoc(className).size / _documents.size.toDouble
+  private def _getProbClass(className: String) = _classesToDoc(className).size / _documents.size.toDouble
   
-  def getProbWordClass(word: String, className: String) =
+  private val _probWordClassCache : MutMap[String, Double] = MutMap()
+  private val _PROB_WORD_CLASS_MAX_SIZE = 1000
+  
+  private def _getProbWordClass(word: String, className: String) =
+  {
+    if(_probWordClassCache.size > _PROB_WORD_CLASS_MAX_SIZE) _probWordClassCache.clear
+	  
+    _probWordClassCache.getOrElseUpdate(word + "-" + className, _computeProbWordClass(word, className))
+  }
+  
+  private def _computeProbWordClass(word: String, className: String) =
   {
     var sumTf = 0
     var sumDocSize = 0
@@ -39,19 +42,18 @@ class NaiveBayes extends AClassifier
     sumTf / sumDocSize.toDouble
   }
   
-  override def apply(document: List[String]) =
+  override def apply(tokens: List[String]) =
   {
     var max = Double.MinValue 
     var result = ""
-    var content = Helper.stemTokens(document)
     
     for(classToDoc <- _classesToDoc.par)
     {
-      var prob = Math.log(getProbClass(classToDoc._1))
+      var prob = _classesProb(classToDoc._1)
       
-      for(term <- content)
+      for(term <- tokens)
       {
-        prob += Math.log(getProbWordClass(term, classToDoc._1))
+        prob += Math.log(_getProbWordClass(term, classToDoc._1))
       }
       
       if(prob > max)

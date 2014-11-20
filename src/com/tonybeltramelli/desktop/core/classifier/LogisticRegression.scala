@@ -1,7 +1,6 @@
 package com.tonybeltramelli.desktop.core.classifier
 
 import scala.collection.mutable.{Map => MutMap}
-import com.tonybeltramelli.desktop.util.Helper
 import scala.collection.mutable.ListBuffer
 
 class LogisticRegression extends AClassifier
@@ -9,22 +8,20 @@ class LogisticRegression extends AClassifier
   private val _documentFreq : MutMap[String, Int] = MutMap()
   private var _theta: Array[Double] = Array(0.0)
   
-  override def train(documentName: String, tokens: List[String], classCodes : Set[String])
+  def trains(documentName: String, tokens: List[String], classCodes : Set[String])
   {
-    val content = Helper.stemTokens(tokens)
+    //_updateDocumentFreq(tokens)
     
-    //_updateDocumentFreq(content)
-    
-    val documentFeatures = _getDocumentFeatures(content)
+    val documentFeatures = _getDocumentFeatures(tokens)
     
     _theta = _theta ++ _update(_theta, documentFeatures, true)
     
     _documentCounter += 1
   }
   
-  override def apply(document: List[String]) =
+  override def apply(tokens: List[String]) =
   {
-    _logistic(_theta, _getDocumentFeatures(Helper.stemTokens(document)))
+    _logistic(_theta, _getDocumentFeatures(tokens))
     Set("")
   }
   
