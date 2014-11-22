@@ -68,6 +68,14 @@ trait AClassifier
   
   private def _updateDocumentFreq(tf: Map[String, Int])
   {
+    /*
+     * for(t <- m2)
+    {
+      val v = m1.getOrElse(t._1, 0)
+      
+      if(v != 0) m1.update(t._1, t._2 + v) else m1 += t._1 -> t._2
+    }
+     */
     _documentFreq = (_documentFreq.toSeq ++ tf.toSeq.sortBy(-_._2).take(_TERM_CUT_SIZE)).groupBy(_._1).mapValues(_.map(_._2).reduce(_ + _))
   }
 }

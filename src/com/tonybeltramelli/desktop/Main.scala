@@ -10,6 +10,8 @@ import com.tonybeltramelli.desktop.util.Printer
 import com.tonybeltramelli.desktop.util.Helper
 import com.tonybeltramelli.desktop.util.StopWordStemmer
 
+import scala.collection.mutable.{Map => MutMap}
+
 object Main
 {
   def main(args: Array[String])
