@@ -4,7 +4,7 @@ import scala.collection.mutable.{Map => MutMap}
 
 class NaiveBayes extends AClassifier
 {
-  protected val _classesProb : MutMap[String, Double] = MutMap() // className -> documentIndexes
+  protected val _classesProb : MutMap[String, Double] = MutMap() //class name -> documentIndexes
   
   override def train(topic: String)
   {

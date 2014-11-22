@@ -60,7 +60,7 @@ class Main
     Helper.time("train classifiers...")
     
     _classifier.trainAll
-    /*
+    
     Helper.time("parse labelled testing set...")
 
     _printer = new Printer(Helper.getResource(Helper.OUTPUT_FILE), classifierNumber)
@@ -74,7 +74,7 @@ class Main
     Helper.time("parse unlabelled testing set...")
     
     _parser.parse(Helper.TEST_WITHOUT_LABELS , unlabelledTest)
-    _printer.save*/
+    _printer.save
         
     Helper.time("script done")
   }

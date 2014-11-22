@@ -8,18 +8,17 @@ trait AClassifier
 {
   private val _TERM_CUT_SIZE = 50
   
-  protected val _classesToDoc : MutMap[String, List[Int]] = MutMap() // className -> documentIndexes
-  protected val _documents : MutMap[Int, (Map[String, Int], Int)] = MutMap() // documentIndex -> (tfs, size)
+  protected val _classesToDoc : MutMap[String, List[Int]] = MutMap() //class name -> document indexes
+  protected val _documents : MutMap[Int, (Map[String, Int], Int)] = MutMap() //document index -> ((term -> tfs), size)
 	
   protected var _documentCounter = 0
   
-  protected var _documentFreq : MutMap[String, Double] = MutMap()
+  protected var _inverseFreq : MutMap[String, Double] = MutMap() //term -> tf-idf
   
   def preprocess(tokens: List[String], classCodes : Set[String])
   {
-    val tf = _getTermFreq(tokens)
+    val tf = _getTermFreq(tokens).toSeq.sortBy(-_._2).take(_TERM_CUT_SIZE).toMap
     _documents += _documentCounter -> (tf, tokens.length)
-    _updateDocumentFreq(tf)
     
     for(c <- classCodes)
     {
@@ -37,7 +36,7 @@ trait AClassifier
       train(classToDoc._1)
     }
     
-    _documentFreq = _getInverseDocumentFreq(_documentFreq , _documentCounter)
+    _computeTermFreqInverseDocumentFreq
   }
   
   def train(topic: String)
@@ -61,18 +60,20 @@ trait AClassifier
     _getTermFreq(collection.flatMap(d => d._2).toList)
   }
   
-  private def _getInverseDocumentFreq(df: MutMap[String, Double], documentNumber: Int) =
+  private def _computeTermFreqInverseDocumentFreq
   {
-    df.map(f => f._1 -> (Math.log(documentNumber) - Math.log(f._2)))
-  }
-  
-  private def _updateDocumentFreq(tf: Map[String, Int])
-  {
-    for(t <- tf.toSeq.sortBy(-_._2).take(_TERM_CUT_SIZE))
+    Helper.time("compute tf-idf")
+    
+    for(d <- _documents.map(_._2._1))
     {
-      val v = _documentFreq.getOrElse(t._1, -1.0)
-      
-      if(v >= 0) _documentFreq.update(t._1, t._2 + v) else _documentFreq += t._1 -> t._2
+      for(t <- d)
+      {
+	      val v = _inverseFreq.getOrElse(t._1, -1.0)
+	      
+	      if(v >= 0) _inverseFreq.update(t._1, t._2 + v) else _inverseFreq += t._1 -> t._2
+      }
     }
+    
+    _inverseFreq = _inverseFreq.map(f => f._1 -> (Math.log(_documentCounter) - Math.log(f._2)))
   }
 }
