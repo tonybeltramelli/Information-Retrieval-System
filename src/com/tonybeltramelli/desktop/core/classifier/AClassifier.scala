@@ -13,7 +13,7 @@ trait AClassifier
 	
   protected var _documentCounter = 0
   
-  protected var _documentFreq : Map[String, Int] = Map()
+  protected var _documentFreq : MutMap[String, Double] = MutMap()
   
   def preprocess(tokens: List[String], classCodes : Set[String])
   {
@@ -37,7 +37,7 @@ trait AClassifier
       train(classToDoc._1)
     }
     
-    println(_getInverseDocumentFreq(_documentFreq, _documentCounter).size)
+    _documentFreq = _getInverseDocumentFreq(_documentFreq , _documentCounter)
   }
   
   def train(topic: String)
@@ -61,21 +61,18 @@ trait AClassifier
     _getTermFreq(collection.flatMap(d => d._2).toList)
   }
   
-  private def _getInverseDocumentFreq(df: Map[String, Int], documentNumber: Int) =
+  private def _getInverseDocumentFreq(df: MutMap[String, Double], documentNumber: Int) =
   {
-    df.mapValues(Math.log(documentNumber) - Math.log(_))
+    df.map(f => f._1 -> (Math.log(documentNumber) - Math.log(f._2)))
   }
   
   private def _updateDocumentFreq(tf: Map[String, Int])
   {
-    /*
-     * for(t <- m2)
+    for(t <- tf.toSeq.sortBy(-_._2).take(_TERM_CUT_SIZE))
     {
-      val v = m1.getOrElse(t._1, 0)
+      val v = _documentFreq.getOrElse(t._1, -1.0)
       
-      if(v != 0) m1.update(t._1, t._2 + v) else m1 += t._1 -> t._2
+      if(v >= 0) _documentFreq.update(t._1, t._2 + v) else _documentFreq += t._1 -> t._2
     }
-     */
-    _documentFreq = (_documentFreq.toSeq ++ tf.toSeq.sortBy(-_._2).take(_TERM_CUT_SIZE)).groupBy(_._1).mapValues(_.map(_._2).reduce(_ + _))
   }
 }
