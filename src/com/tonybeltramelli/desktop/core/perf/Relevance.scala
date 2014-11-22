@@ -24,10 +24,10 @@ class Relevance
     val falseNegative = (expecedTopics -- retrievedTopics).size
     val trueNegative = retrievedTopics.size - truePositive - falsePositive - falseNegative
     
-    val precision = truePositive / (truePositive + falsePositive).toDouble
-    val recall = truePositive / (truePositive + falseNegative).toDouble
+    val precision = truePositive / _denominator((truePositive + falsePositive).toDouble)
+    val recall = truePositive / _denominator((truePositive + falseNegative).toDouble)
     
-    val f1Score = 2 * (precision * recall) / (if(precision + recall == 0) 1 else (precision + recall))
+    val f1Score = 2 * (precision * recall) / _denominator(precision + recall)
     
     _totalPrecision += precision
     _totalRecall += recall
@@ -36,6 +36,11 @@ class Relevance
     _documentNumber += 1
     
     (precision, recall, f1Score)
+  }
+  
+  private def _denominator(d: Double) =
+  {
+    if(d <= 0.0) 1.0 else d
   }
   
   def totalAverageRelevance = (_totalPrecision / _documentNumber, _totalRecall / _documentNumber, _totalF1Score / _documentNumber)

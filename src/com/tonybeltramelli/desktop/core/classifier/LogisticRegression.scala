@@ -16,7 +16,7 @@ class LogisticRegression extends AClassifier
     {
       val doc = _documents(docIndex)
       
-      bc.feed(doc._1.map(f => f._2.toDouble).toArray)
+      bc.feed(doc._1.map(f => _inverseFreq(f._1)).toArray)
     }
    
     _classifiers += topic -> bc

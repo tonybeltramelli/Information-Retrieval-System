@@ -31,12 +31,12 @@ trait AClassifier
   
   def trainAll
   {
+    _computeTermFreqInverseDocumentFreq
+    
     for(classToDoc <- _classesToDoc.par)
     {
       train(classToDoc._1)
     }
-    
-    _computeTermFreqInverseDocumentFreq
   }
   
   def train(topic: String)
