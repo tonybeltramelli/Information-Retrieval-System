@@ -1,15 +1,14 @@
 package com.tonybeltramelli.desktop
 
-import com.tonybeltramelli.desktop.util.Helper
 import com.tonybeltramelli.desktop.core.parser.Parser
 import com.tonybeltramelli.desktop.core.classifier.AClassifier
 import com.tonybeltramelli.desktop.core.classifier.LogisticRegression
 import com.tonybeltramelli.desktop.core.classifier.NaiveBayes
 import com.tonybeltramelli.desktop.core.classifier.SupportVectorMachines
-import scala.collection.mutable.ListBuffer
 import com.tonybeltramelli.desktop.core.perf.Relevance
 import com.tonybeltramelli.desktop.util.Printer
-import scala.collection.immutable.ListMap
+import com.tonybeltramelli.desktop.util.Helper
+import com.tonybeltramelli.desktop.util.StopWordStemmer
 
 object Main
 {
@@ -52,48 +51,40 @@ class Main
     
     _parser.documentNumber = if(documentNumber != -1) documentNumber else Int.MaxValue
     
-    Helper.time
-    println("parse training set...")
+    Helper.time("parse training set...")
 
     _parser.parse(Helper.TRAIN, preprocess)
     
-    Helper.time
-    println("train classifiers...")
+    Helper.time("train classifiers...")
     
     _classifier.trainAll
-    
-    Helper.time
-    println("parse labelled testing set...")
+    /*
+    Helper.time("parse labelled testing set...")
 
     _printer = new Printer(Helper.getResource(Helper.OUTPUT_FILE), classifierNumber)
-
     _relevance.reset
     _parser.parse(Helper.TEST_WITH_LABELS, labelledTest)
-        
     _printer.save
     _printer.prepend(_relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3 + "\n", true)
     
     println("total relevance : " + _relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3)
     
-    Helper.time
-    println("parse unlabelled testing set...")
+    Helper.time("parse unlabelled testing set...")
     
     _parser.parse(Helper.TEST_WITHOUT_LABELS , unlabelledTest)
-    
-    _printer.save
+    _printer.save*/
         
-    println("script done")
-	Helper.time
+    Helper.time("script done")
   }
   
   def preprocess
   {
-    _classifier.preprocess(Helper.stemTokens(_parser.doc.tokens), _parser.doc.topics)
+    _classifier.preprocess(StopWordStemmer.stemTokens(_parser.doc.tokens), _parser.doc.topics)
   }
   
   def labelledTest
   {
-    val retrieved = _classifier.apply(Helper.stemTokens(_parser.doc.tokens))
+    val retrieved = _classifier.apply(StopWordStemmer.stemTokens(_parser.doc.tokens))
     val expected = _parser.doc.topics
     
     val relevance = _relevance.assess(retrieved, expected)

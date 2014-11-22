@@ -31,7 +31,7 @@ class LogisticRegression extends AClassifier
     results.map(_._1).toSet
   }
   
-  class BinaryClassifierLR
+  class BinaryClassifierLR // binary linear classifier
   {
     private var _theta: Array[Double] = Array(0.0)
     

@@ -1,15 +1,5 @@
 package com.tonybeltramelli.desktop.util
 
-import scala.collection.mutable.{Map => MutMap}
-import com.github.aztek.porterstemmer.PorterStemmer
-import scala.collection.mutable.Iterable
-import java.io.File
-import java.io.FileWriter
-import java.io.BufferedWriter
-
-class Helper {
-}
-
 object Helper {
   val ZIP_PATH = "/data"
   val TEST_WITH_LABELS = "/test-with-labels"
@@ -19,7 +9,6 @@ object Helper {
   val OUTPUT_FILE = "/output/classify-tony-beltramelli-{M}-{C}.run"
   
   val RESULT_NUMBER = 100
-  val TOKEN_MAX_SIZE = 100000
 
   val IS_DEBUG_MODE: Boolean = false
 
@@ -41,23 +30,16 @@ object Helper {
     println(s)
   }
   
-  private val _stemStore : MutMap[String, String] = MutMap()
-  
-  def stemTokens(list: List[String]) : List[String] = 
+  def time(message: String)
   {
-    if(_stemStore.size > TOKEN_MAX_SIZE) _stemStore.clear
-	  
-    list.map(t => t.toLowerCase()).map(v => _stemStore.getOrElseUpdate(v, PorterStemmer.stem(v)))
-  }
-  
-  def time {
     println("time "+_i+" : " + (System.nanoTime() - _time) / 1000000000.0 + " seconds")
+    println(message)
     _i += 1
   }
 	
   def log2(x: Double) = Math.log10(x) / Math.log10(2.0)
   
-  def flipDimensions(original : Iterable[(String, List[(Int, Double)])]) : Map[Int, Iterable[(String, Double)]] =
+  def flipDimensions(original: Iterable[(String, List[(Int, Double)])]): Map[Int, Iterable[(String, Double)]] =
   {
     val flatten = for {
       (s, v) <- original

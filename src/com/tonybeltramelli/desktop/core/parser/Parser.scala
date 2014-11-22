@@ -15,7 +15,7 @@ class Parser {
   {
     val path = Helper.getResource(resource)
     val iter = new ReutersCorpusIterator(Helper.getResource(Helper.TRAIN))
-
+    
     var documentCounter = 0
     
     while (iter.hasNext && documentCounter < documentNumber) {
@@ -27,8 +27,7 @@ class Parser {
 
       if(documentCounter > 0 && documentCounter % 1000 == 0)
       {
-        Helper.time
-        println(documentCounter + " documents processed")
+        Helper.time(documentCounter + " documents processed")
       }
     }
 
