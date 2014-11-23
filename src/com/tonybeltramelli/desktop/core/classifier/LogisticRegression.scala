@@ -8,13 +8,13 @@ class LogisticRegression extends AClassifier
 {
   private val _classifiers: MutMap[String, BinaryLinearClassifier] = MutMap() //class name -> binary classifier
   private val _THRESHOLD = 0.5
-  private val _TOPIC_LIMIT = 5
   
   override def train(topic: String)
   {
     val bc = new BinaryLinearClassifier
+    
     /*
-    for(cl <- _getTopics(topic).par)
+    for(cl <- _getRandomTopics(topic).par)
     {
       val isRelated = topic == cl._1
         
@@ -51,23 +51,21 @@ class LogisticRegression extends AClassifier
     val random = new Random
     var documents = _classesToDoc(trueTopic)
     
-    var i = documents.size + Math.round(_documentCounter / 100)
+    var i = documents.size * 3
+    i = if(i > _documentCounter) _documentCounter else i
     
     while(i > 0)
     {
-      val pos = random.nextInt(_documents.size)
-      
-      if(!documents.contains(pos))
-      {
-        documents = documents + pos
-        i -= 1
-      }
+      documents = documents + random.nextInt(_documents.size)
+      i -= 1
     }
     
     documents
   }
   
-  private def _getTopics(trueTopic: String) =
+  private val _TOPIC_LIMIT = 5
+  
+  private def _getRandomTopics(trueTopic: String) =
   {
     val random = new Random
     val falseTopics = _classesToDoc.filter(_._1 != trueTopic).zipWithIndex.map(m => m._2 -> m._1)
