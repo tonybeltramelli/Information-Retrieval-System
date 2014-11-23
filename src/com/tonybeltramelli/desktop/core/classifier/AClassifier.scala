@@ -59,7 +59,7 @@ trait AClassifier
       for(t <- d)
       {
 	      val v = _inverseFreq.getOrElse(t._1, -1.0)
-	      
+
 	      if(v >= 0) _inverseFreq.update(t._1, t._2 + v) else _inverseFreq += t._1 -> t._2
       }
     }
