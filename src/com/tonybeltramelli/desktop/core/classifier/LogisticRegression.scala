@@ -6,17 +6,22 @@ import scala.collection.mutable.ListBuffer
 class LogisticRegression extends AClassifier
 {
   private val _classifiers: MutMap[String, BinaryClassifierLR] = MutMap() //class name -> binary classifier
-  private val _THRESHOLD = 0.9
+  private val _THRESHOLD = 0.5
   
   override def train(topic: String)
   {
     val bc = new BinaryClassifierLR
     
-    for(docIndex <- _classesToDoc(topic))
+    for(cl <- _classesToDoc)
     {
-      val doc = _documents(docIndex)
+      val isRelated = topic == cl._1
+        
+      for(docIndex <- _classesToDoc(cl._1))
+      {
+        val doc = _documents(docIndex) 
       
-      bc.feed(doc._1.map(f => _inverseFreq(f._1)).toArray)
+        bc.feed(doc._1.map(f => _inverseFreq(f._1)).toArray, isRelated)
+      }
     }
    
     _classifiers += topic -> bc
@@ -35,9 +40,9 @@ class LogisticRegression extends AClassifier
   {
     private var _theta: Array[Double] = Array(0.0)
     
-    def feed(documentFeatures: Array[Double])
+    def feed(documentFeatures: Array[Double], isRelated: Boolean)
     {
-      _theta = _theta ++ _update(_theta, documentFeatures, true)
+      _theta = _theta ++ _update(_theta, documentFeatures, isRelated)
     }
     
     def getProb(documentFeatures: Array[Double]) =

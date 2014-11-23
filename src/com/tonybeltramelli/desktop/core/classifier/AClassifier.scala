@@ -17,7 +17,7 @@ trait AClassifier
   
   def preprocess(tokens: List[String], classCodes : Set[String])
   {
-    val tf = _getTermFreq(tokens).toSeq.sortBy(-_._2).take(_TERM_CUT_SIZE).toMap
+    val tf = _getTermFreq(tokens)
     _documents += _documentCounter -> (tf, tokens.length)
     
     for(c <- classCodes)
@@ -52,12 +52,7 @@ trait AClassifier
 	
   protected def _getTermFreq(doc: List[String]) =
   {
-    doc.groupBy(identity).mapValues(l => l.length)
-  }
-	
-  private def _getCollectionFreq(collection: Stream[(String, List[String])]) =
-  {
-    _getTermFreq(collection.flatMap(d => d._2).toList)
+    doc.groupBy(identity).mapValues(l => l.length).toSeq.sortBy(-_._2).take(_TERM_CUT_SIZE).toMap
   }
   
   private def _computeTermFreqInverseDocumentFreq
