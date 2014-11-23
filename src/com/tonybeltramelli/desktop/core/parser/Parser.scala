@@ -14,7 +14,7 @@ class Parser {
   def parse(resource: String, callback: => Unit)
   {
     val path = Helper.getResource(resource)
-    val iter = new ReutersCorpusIterator(Helper.getResource(Helper.TRAIN))
+    val iter = new ReutersCorpusIterator(path)
     
     var documentCounter = 0
     

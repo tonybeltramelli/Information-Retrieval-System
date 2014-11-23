@@ -34,8 +34,8 @@ object Main
 class Main
 {
   private var _classifier : AClassifier = null
-  private val _parser : Parser = new Parser
-  private val _relevance : Relevance = new Relevance
+  private val _parser = new Parser
+  private val _relevance = new Relevance
   private var _printer : Printer = null
   
   def this(rootPath: String, classifierNumber: Int, documentNumber: Int)
