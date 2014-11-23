@@ -9,8 +9,8 @@ import com.tonybeltramelli.desktop.core.perf.Relevance
 import com.tonybeltramelli.desktop.util.Printer
 import com.tonybeltramelli.desktop.util.Helper
 import com.tonybeltramelli.desktop.util.StopWordStemmer
-
 import scala.collection.mutable.{Map => MutMap}
+import scala.util.Random
 
 object Main
 {

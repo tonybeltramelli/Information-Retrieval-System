@@ -2,25 +2,27 @@ package com.tonybeltramelli.desktop.core.classifier
 
 import scala.collection.mutable.{Map => MutMap}
 import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 class LogisticRegression extends AClassifier
 {
-  private val _classifiers: MutMap[String, BinaryClassifierLR] = MutMap() //class name -> binary classifier
+  private val _classifiers: MutMap[String, BinaryLinearClassifier] = MutMap() //class name -> binary classifier
   private val _THRESHOLD = 0.5
+  private val _TOPIC_LIMIT = 3
   
   override def train(topic: String)
   {
-    val bc = new BinaryClassifierLR
+    val bc = new BinaryLinearClassifier
     
-    for(cl <- _classesToDoc)
+    for(cl <- _getTopics(topic))
     {
       val isRelated = topic == cl._1
         
       for(docIndex <- _classesToDoc(cl._1))
       {
-        val doc = _documents(docIndex) 
+        val doc = _documents(docIndex)
       
-        bc.feed(doc._1.map(f => _inverseFreq(f._1)).toArray, isRelated)
+        bc.train(doc._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
       }
     }
    
@@ -29,64 +31,34 @@ class LogisticRegression extends AClassifier
   
   override def apply(tokens: List[String]) =
   {
-    val documentFeatures = _getTermFreq(tokens).map(f => f._2.toDouble).toArray
+    //val documentFeatures = tokens.map(f => f -> _inverseFreq.getOrElse(f, 0.0)).filter(_._2 > 0.0).toMap //_getTermFreq(tokens).map(f => f._1 -> f._2.toDouble)
     
+    val documentFeatures = _getTermFreq(tokens).map(f => f._1 -> (f._2.toDouble + _inverseFreq.getOrElse(f._1, 0.0)))
+      
     val results = _classifiers.map(bc => (bc._1, bc._2.getProb(documentFeatures))).filter(_._2 >= _THRESHOLD).toSeq.sortWith(_._2 > _._2)
     
     results.map(_._1).toSet
   }
   
-  class BinaryClassifierLR // binary linear classifier
+  private def _getTopics(trueTopic: String) =
   {
-    private var _theta: Array[Double] = Array(0.0)
+    val random = new Random
+    val falseTopics = _classesToDoc.filter(_._1 != trueTopic).zipWithIndex.map(m => m._2 -> m._1)
+    var result : MutMap[String, List[Int]] = MutMap(trueTopic -> _classesToDoc(trueTopic))
     
-    def feed(documentFeatures: Array[Double], isRelated: Boolean)
-    {
-      _theta = _theta ++ _update(_theta, documentFeatures, isRelated)
-    }
+    var i = _TOPIC_LIMIT
     
-    def getProb(documentFeatures: Array[Double]) =
+    while(i > 0)
     {
-      _logistic(_theta, documentFeatures)
-    }
-  
-    private def _update(theta: Array[Double], documentFeatures: Array[Double], isRelated: Boolean) =
-    {
-      _vectorAddition(_gradientTheta(theta, documentFeatures, isRelated), theta)
-    }
-  
-    private def _gradientTheta(theta: Array[Double], documentFeatures: Array[Double], isRelated: Boolean) =
-    {
-      var chain = 0.0
-    
-      isRelated match
+      val pos = random.nextInt(falseTopics.size)
+      
+      if(!result.contains(falseTopics(pos)._1))
       {
-        case true => chain = 1 - _logistic(theta, documentFeatures)
-        case false => chain = - _logistic(theta, documentFeatures)
+        result += falseTopics(pos)
+        i -= 1
       }
+    }
     
-      _scalarMultiplication(documentFeatures, chain)
-    }
-  
-    private def _logistic(theta: Array[Double], documentFeatures: Array[Double]) =
-    {
-      1.0 / (1.0 + Math.exp(- _scalarProduct(documentFeatures, theta)))
-    }
-  
-    private def _scalarProduct(vector1: Array[Double], vector2: Array[Double]) =
-    {
-      vector1.zip(vector2).map(v => v._1 * v._2).reduce(_ + _)
-      //vector1.map(v => v._2 * vector2.getOrElse(v._1, 0.0)).sum
-    }
-  
-    private def _scalarMultiplication(vector: Array[Double], scalar: Double) =
-    {
-      vector.map(v => v * scalar)
-    }
-  
-    private def _vectorAddition(vector1: Array[Double], vector2: Array[Double]) =
-    {
-      vector1.zip(vector2).map(v => v._1 + v._2)
-    }
+    result
   }
 }

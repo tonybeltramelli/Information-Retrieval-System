@@ -23,7 +23,7 @@ trait AClassifier
     for(c <- classCodes)
     {
       val cl = _classesToDoc.getOrElseUpdate(c, List[Int]())  
-      _classesToDoc.update(c, cl :+ _documentCounter)      
+      _classesToDoc.update(c, cl :+ _documentCounter)
     }
     
     _documentCounter += 1
