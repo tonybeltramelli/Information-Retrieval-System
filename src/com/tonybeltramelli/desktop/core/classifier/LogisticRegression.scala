@@ -26,11 +26,12 @@ class LogisticRegression extends AClassifier
       }
     }*/
     
-    for(doc <- _documents.par)
+    for(docIndex <- _getRandomDocuments(topic).par)
     {
-      val isRelated = doc._2._3.contains(topic)
+      val doc = _documents(docIndex)
+      val isRelated = doc._3.contains(topic)
       
-      bc.train(doc._2._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
+      bc.train(doc._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
     }
    
     _classifiers += topic -> bc
@@ -45,11 +46,32 @@ class LogisticRegression extends AClassifier
     results.map(_._1).toSet
   }
   
+  private def _getRandomDocuments(trueTopic: String) =
+  {
+    val random = new Random
+    var documents = _classesToDoc(trueTopic)
+    
+    var i = documents.size + Math.round(_documentCounter / 100)
+    
+    while(i > 0)
+    {
+      val pos = random.nextInt(_documents.size)
+      
+      if(!documents.contains(pos))
+      {
+        documents = documents + pos
+        i -= 1
+      }
+    }
+    
+    documents
+  }
+  
   private def _getTopics(trueTopic: String) =
   {
     val random = new Random
     val falseTopics = _classesToDoc.filter(_._1 != trueTopic).zipWithIndex.map(m => m._2 -> m._1)
-    var result : MutMap[String, List[Int]] = MutMap(trueTopic -> _classesToDoc(trueTopic))
+    var result = MutMap(trueTopic -> _classesToDoc(trueTopic))
     
     var i = _TOPIC_LIMIT
     
