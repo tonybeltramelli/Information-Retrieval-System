@@ -26,12 +26,20 @@ class LogisticRegression extends AClassifier
       }
     }*/
     
+    /*
     for(docIndex <- _getRandomDocuments(topic).par)
     {
       val doc = _documents(docIndex)
       val isRelated = doc._3.contains(topic)
       
       bc.train(doc._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
+    }*/
+    
+    for(d <- _getRandom(topic).par)
+    {
+      val doc = _documents(d._1)
+      
+      bc.train(doc._1.map(f => f._1 -> _inverseFreq(f._1)), d._2)
     }
    
     _classifiers += topic -> bc
@@ -44,6 +52,26 @@ class LogisticRegression extends AClassifier
     val results = _classifiers.map(bc => (bc._1, bc._2.getProb(documentFeatures))).filter(_._2 >= _THRESHOLD).toSeq.sortWith(_._2 > _._2)
     
     results.map(_._1).toSet
+  }
+  
+  private def _getRandom(trueTopic: String) =
+  {
+    val random = new Random
+    val falseTopics = _classesToDoc.filter(_._1 != trueTopic).zipWithIndex.map(m => m._2 -> m._1)
+    var documents = _classesToDoc(trueTopic).map((_, true))
+    
+    var i = documents.size * 3
+    i = if(i > _documentCounter) _documentCounter else i
+    
+    while(i > 0)
+    {
+      val falseDocuments = falseTopics(random.nextInt(falseTopics.size))._2.zipWithIndex.map(m => m._2 -> m._1).toMap
+      documents = documents + ((falseDocuments(random.nextInt(falseDocuments.size)), false))
+      
+      i -= 1
+    }
+    
+    documents
   }
   
   private def _getRandomDocuments(trueTopic: String) =
