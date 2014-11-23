@@ -8,22 +8,29 @@ class LogisticRegression extends AClassifier
 {
   private val _classifiers: MutMap[String, BinaryLinearClassifier] = MutMap() //class name -> binary classifier
   private val _THRESHOLD = 0.5
-  private val _TOPIC_LIMIT = 3
+  private val _TOPIC_LIMIT = 5
   
   override def train(topic: String)
   {
     val bc = new BinaryLinearClassifier
-    
+    /*
     for(cl <- _getTopics(topic).par)
     {
       val isRelated = topic == cl._1
         
-      for(docIndex <- _classesToDoc(cl._1))
+      for(docIndex <- _classesToDoc(cl._1).par)
       {
         val doc = _documents(docIndex)
       
         bc.train(doc._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
       }
+    }*/
+    
+    for(doc <- _documents.par)
+    {
+      val isRelated = doc._2._3.contains(topic)
+      
+      bc.train(doc._2._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
     }
    
     _classifiers += topic -> bc
@@ -31,9 +38,7 @@ class LogisticRegression extends AClassifier
   
   override def apply(tokens: List[String]) =
   {
-    val documentFeatures = _getTermFreq(tokens).map(f => f._1 -> _inverseFreq.getOrElse(f._1, 0.0)).filter(_._2 > 0.0).toMap
-    //val documentFeatures = _getTermFreq(tokens).map(f => f._1 -> (f._2.toDouble + _inverseFreq.getOrElse(f._1, 0.0)))
-    //val documentFeatures = tokens.map(f => f -> _inverseFreq.getOrElse(f, 0.0)).filter(_._2 > 0.0).toMap
+    val documentFeatures = _getTermFreq(tokens).map(f => f._1 -> (f._2.toDouble + _inverseFreq.getOrElse(f._1, 0.0)))
       
     val results = _classifiers.map(bc => (bc._1, bc._2.getProb(documentFeatures))).filter(_._2 >= _THRESHOLD).toSeq.sortWith(_._2 > _._2)
     

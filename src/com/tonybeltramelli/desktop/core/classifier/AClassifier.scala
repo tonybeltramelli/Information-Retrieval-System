@@ -1,15 +1,13 @@
 package com.tonybeltramelli.desktop.core.classifier
 
 import scala.collection.mutable.{Map => MutMap}
-import scala.collection.mutable.ListBuffer
-import com.tonybeltramelli.desktop.util.Helper
 
 trait AClassifier
 {
   private val _TERM_CUT_SIZE = 50
   
   protected val _classesToDoc : MutMap[String, List[Int]] = MutMap() //class name -> document indexes
-  protected val _documents : MutMap[Int, (Map[String, Int], Int)] = MutMap() //document index -> ((term -> tfs), size)
+  protected val _documents : MutMap[Int, (Map[String, Int], Int, Set[String])] = MutMap() //document index -> ((term -> tfs), size)
 	
   protected var _documentCounter = 0
   
@@ -17,8 +15,7 @@ trait AClassifier
   
   def preprocess(tokens: List[String], classCodes : Set[String])
   {
-    val tf = _getTermFreq(tokens)
-    _documents += _documentCounter -> (tf, tokens.length)
+    _documents += _documentCounter -> (_getTermFreq(tokens), tokens.length, classCodes)
     
     for(c <- classCodes)
     {
@@ -57,8 +54,6 @@ trait AClassifier
   
   private def _computeTermFreqInverseDocumentFreq
   {
-    Helper.time("compute tf-idf")
-    
     for(d <- _documents.map(_._2._1))
     {
       for(t <- d)
