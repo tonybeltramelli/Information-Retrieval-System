@@ -14,7 +14,7 @@ class LogisticRegression extends AClassifier
   {
     val bc = new BinaryLinearClassifier
     
-    for(cl <- _getTopics(topic))
+    for(cl <- _getTopics(topic).par)
     {
       val isRelated = topic == cl._1
         
@@ -31,9 +31,9 @@ class LogisticRegression extends AClassifier
   
   override def apply(tokens: List[String]) =
   {
-    //val documentFeatures = tokens.map(f => f -> _inverseFreq.getOrElse(f, 0.0)).filter(_._2 > 0.0).toMap //_getTermFreq(tokens).map(f => f._1 -> f._2.toDouble)
-    
-    val documentFeatures = _getTermFreq(tokens).map(f => f._1 -> (f._2.toDouble + _inverseFreq.getOrElse(f._1, 0.0)))
+    val documentFeatures = _getTermFreq(tokens).map(f => f._1 -> _inverseFreq.getOrElse(f._1, 0.0)).filter(_._2 > 0.0).toMap
+    //val documentFeatures = _getTermFreq(tokens).map(f => f._1 -> (f._2.toDouble + _inverseFreq.getOrElse(f._1, 0.0)))
+    //val documentFeatures = tokens.map(f => f -> _inverseFreq.getOrElse(f, 0.0)).filter(_._2 > 0.0).toMap
       
     val results = _classifiers.map(bc => (bc._1, bc._2.getProb(documentFeatures))).filter(_._2 >= _THRESHOLD).toSeq.sortWith(_._2 > _._2)
     
