@@ -1,4 +1,4 @@
-package com.tonybeltramelli.desktop.core.classifier
+package com.tonybeltramelli.desktop.core.classifier.multiclass
 
 import scala.collection.mutable.{Map => MutMap}
 
@@ -38,12 +38,12 @@ trait AClassifier
   
   def train(topic: String)
   {
-    //to be overridden
+    //to override
   }
   
   def apply(tokens: List[String]) =
   {
-    //to be overridden
+    //to override
     Set("")
   }
 	

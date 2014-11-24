@@ -1,6 +1,7 @@
 package com.tonybeltramelli.desktop.core.classifier
 
 import scala.collection.mutable.{Map => MutMap}
+import com.tonybeltramelli.desktop.core.classifier.multiclass.AClassifier
 
 class NaiveBayes extends AClassifier
 {

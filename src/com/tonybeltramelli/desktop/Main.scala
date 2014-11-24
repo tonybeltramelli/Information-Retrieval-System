@@ -1,7 +1,6 @@
 package com.tonybeltramelli.desktop
 
 import com.tonybeltramelli.desktop.core.parser.Parser
-import com.tonybeltramelli.desktop.core.classifier.AClassifier
 import com.tonybeltramelli.desktop.core.classifier.LogisticRegression
 import com.tonybeltramelli.desktop.core.classifier.NaiveBayes
 import com.tonybeltramelli.desktop.core.classifier.SupportVectorMachines
@@ -11,6 +10,7 @@ import com.tonybeltramelli.desktop.util.Helper
 import com.tonybeltramelli.desktop.util.StopWordStemmer
 import scala.collection.mutable.{Map => MutMap}
 import scala.util.Random
+import com.tonybeltramelli.desktop.core.classifier.multiclass.AClassifier
 
 object Main
 {

@@ -2,8 +2,6 @@ package com.tonybeltramelli.desktop.core.parser
 
 import ch.ethz.dal.classifier.processing.ReutersCorpusIterator
 import com.tonybeltramelli.desktop.util.Helper
-import com.tonybeltramelli.desktop.core.classifier.AClassifier
-import com.tonybeltramelli.desktop.core.classifier.NaiveBayes
 import ch.ethz.dal.classifier.processing.ReutersRCVParse
 
 class Parser {
