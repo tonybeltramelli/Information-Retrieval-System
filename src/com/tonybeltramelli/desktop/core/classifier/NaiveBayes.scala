@@ -5,62 +5,45 @@ import com.tonybeltramelli.desktop.core.classifier.multiclass.AClassifier
 
 class NaiveBayes extends AClassifier
 {
-  private val _classesProb : MutMap[String, Double] = MutMap() //class name -> probability
-  private val _wordClassProb : MutMap[String, Double] = MutMap() //class name - term -> probability
+  private val _termDocPerClassProb : MutMap[String, (Map[String, Int], Int)] = MutMap() //class name -> ((term -> tfs sum), sizes sum)
   
   override def train(topic: String)
   {
-    /*
-    _classesProb += topic -> _getProbClass(topic)
+    //Laplace smoothing
+    val alpha = 1
     
-    for(docIndex <- _classesToDoc(topic).par)
-    {
-      val doc = _documents(docIndex)
+    val docTfSum = _classesToDoc(topic).flatMap(di => _documents(di)._1).groupBy(identity).map(f => f._1._1 -> f._2.map(_._2 + alpha).sum)
+    val docSizeSum = _classesToDoc(topic).map(di => _documents(di)._2 + (alpha * _vocabularySize)).sum
       
-      for(term <- doc._1)
-      {
-        val word = term._1
-        
-        _wordClassProb.getOrElseUpdate(_getProbWordKey(word, topic), _getProbWordClass(word, topic))
-      }      
-    }*/
+    _termDocPerClassProb += topic -> ((docTfSum, docSizeSum))
   }
   
   private def _getProbClass(className: String) = Math.log(_classesToDoc(className).size / _documents.size.toDouble)
   
   private def _getProbWordClass(word: String, className: String) =
   {
-    var sumTf = 0
-    var sumDocSize = 0
+    val termProb = _termDocPerClassProb(className)
     
-    //Laplace smoothing
-    val alpha = 1
+    val sumTf = termProb._1.getOrElse(word, 0)
+    val sumDocSize = termProb._2
     
-    for(docIndex <- _classesToDoc(className).par)
-    {
-      val doc = _documents(docIndex)
-      
-      sumTf += doc._1.getOrElse(word, 0) + alpha
-      sumDocSize += doc._2 + (alpha * _vocabularySize)
-    }
-    
-    Math.log(sumTf / sumDocSize.toDouble)
+    sumTf / sumDocSize.toDouble
   }
   
   override def apply(tokens: List[String]) =
   {
+    val terms = _getTermFreq(tokens).map(_._1)
+    
     var max = Double.MinValue 
     var result = ""
     
-    for(classToDoc <- _classesToDoc.par)
+    for(classToDoc <- _classesToDoc)
     {
       var prob = _getProbClass(classToDoc._1)
       
-      for(term <- tokens)
+      for(term <- terms)
       {
-        //prob += _wordClassProb.getOrElse(_getProbWordKey(term, classToDoc._1), 0.0)
-        //prob += _getProbWordClass(term, classToDoc._1)
-        prob += _inverseFreq.getOrElse(term, 0.0)
+        prob += _getProbWordClass(term, classToDoc._1)
       }
       
       if(prob > max)

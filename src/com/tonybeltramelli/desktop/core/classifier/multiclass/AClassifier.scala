@@ -7,7 +7,7 @@ trait AClassifier
   private val _TERM_CUT_SIZE = 50
   
   protected val _classesToDoc : MutMap[String, Set[Int]] = MutMap() //class name -> document indexes
-  protected val _documents : MutMap[Int, (Map[String, Int], Int, Set[String])] = MutMap() //document index -> ((term -> tfs), size)
+  protected val _documents : MutMap[Int, (Map[String, Int], Int, Set[String])] = MutMap() //document index -> ((term -> tfs), size, topics)
 	
   protected var _documentCounter = 0
   
