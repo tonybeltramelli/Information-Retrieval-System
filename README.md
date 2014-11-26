@@ -18,8 +18,8 @@ Optimizations :
 - Remove stop words from document before stemming to eliminate semantically nonselective words
 - Use of 2 linked mutable Map data structure _classesToDoc and _documents (in AClassifier) for fast class to document mapping, fast tf-idf computation and fast document feature retrieving
 - In order to deal with imbalanced classes and to speed up the running time, the binary classifiers are trained with a subset of documents selected as follows :
-* All the positive documents of the classifier class
-* N negative randomely selected documents with N = 2 x (number of positive documents for the class)
+    * All the positive documents of the classifier class
+    * N negative randomely selected documents with N = 2 x (number of positive documents for the class)
 
 
 
