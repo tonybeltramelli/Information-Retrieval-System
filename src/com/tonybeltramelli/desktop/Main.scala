@@ -71,10 +71,11 @@ class Main
     
     println("total relevance : " + _relevance.totalAverageRelevance._1 + " " + _relevance.totalAverageRelevance._2 + " " + _relevance.totalAverageRelevance._3)
     
+    /*
     Helper.time("parse unlabelled testing set...")
     
     _parser.parse(Helper.TEST_WITHOUT_LABELS , unlabelledTest)
-    _printer.save
+    _printer.save*/
         
     Helper.time("script done")
   }

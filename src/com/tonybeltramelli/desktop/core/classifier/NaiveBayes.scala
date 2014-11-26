@@ -5,26 +5,30 @@ import com.tonybeltramelli.desktop.core.classifier.multiclass.AClassifier
 
 class NaiveBayes extends AClassifier
 {
-  protected val _classesProb : MutMap[String, Double] = MutMap() //class name -> documentIndexes
+  private val _classesProb : MutMap[String, Double] = MutMap() //class name -> probability
+  private val _wordClassProb : MutMap[String, Double] = MutMap() //class name - term -> probability
   
   override def train(topic: String)
   {
-    _classesProb += topic -> Math.log(_getProbClass(topic))
+    /*
+    _classesProb += topic -> _getProbClass(topic)
+    
+    for(docIndex <- _classesToDoc(topic).par)
+    {
+      val doc = _documents(docIndex)
+      
+      for(term <- doc._1)
+      {
+        val word = term._1
+        
+        _wordClassProb.getOrElseUpdate(_getProbWordKey(word, topic), _getProbWordClass(word, topic))
+      }      
+    }*/
   }
   
-  private def _getProbClass(className: String) = _classesToDoc(className).size / _documents.size.toDouble
-  
-  private val _probWordClassCache : MutMap[String, Double] = MutMap()
-  private val _PROB_WORD_CLASS_MAX_SIZE = 1000
+  private def _getProbClass(className: String) = Math.log(_classesToDoc(className).size / _documents.size.toDouble)
   
   private def _getProbWordClass(word: String, className: String) =
-  {
-    if(_probWordClassCache.size > _PROB_WORD_CLASS_MAX_SIZE) _probWordClassCache.clear
-	  
-    _probWordClassCache.getOrElseUpdate(word + "-" + className, _computeProbWordClass(word, className))
-  }
-  
-  private def _computeProbWordClass(word: String, className: String) =
   {
     var sumTf = 0
     var sumDocSize = 0
@@ -32,7 +36,7 @@ class NaiveBayes extends AClassifier
     //Laplace smoothing
     val alpha = 1
     
-    for(docIndex <- _classesToDoc(className))
+    for(docIndex <- _classesToDoc(className).par)
     {
       val doc = _documents(docIndex)
       
@@ -40,7 +44,7 @@ class NaiveBayes extends AClassifier
       sumDocSize += doc._2 + (alpha * _vocabularySize)
     }
     
-    sumTf / sumDocSize.toDouble
+    Math.log(sumTf / sumDocSize.toDouble)
   }
   
   override def apply(tokens: List[String]) =
@@ -50,11 +54,13 @@ class NaiveBayes extends AClassifier
     
     for(classToDoc <- _classesToDoc.par)
     {
-      var prob = _classesProb(classToDoc._1)
+      var prob = _getProbClass(classToDoc._1)
       
       for(term <- tokens)
       {
-        prob += Math.log(_getProbWordClass(term, classToDoc._1))
+        //prob += _wordClassProb.getOrElse(_getProbWordKey(term, classToDoc._1), 0.0)
+        //prob += _getProbWordClass(term, classToDoc._1)
+        prob += _inverseFreq.getOrElse(term, 0.0)
       }
       
       if(prob > max)
@@ -66,6 +72,8 @@ class NaiveBayes extends AClassifier
     
     Set(result)
   }
+  
+  private def _getProbWordKey(word: String, className: String) = className + "-" + word
   
   private var _cacheVocabularySize = 0
   

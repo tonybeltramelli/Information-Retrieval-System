@@ -6,9 +6,11 @@ class SupportVectorMachineBinary extends ABinaryLinearClassifier
   
   protected override def _gradient(theta: Map[String, Double], documentFeatures: Map[String, Double], isRelated: Boolean) : Map[String, Double] =
   {
+    if(_theta.isEmpty) _theta = documentFeatures.mapValues(v => 1.0)
+    
     _step += 1.0
     
-    val lambda = 0.01
+    val lambda = 0.5
     val direction = if(isRelated) 1.0 else -1.0
     
     val thetaShrink = _scalarMultiplication(theta, 1 - 1.0 / _step)
