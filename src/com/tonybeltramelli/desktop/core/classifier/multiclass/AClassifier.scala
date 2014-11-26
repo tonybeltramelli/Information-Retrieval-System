@@ -1,6 +1,8 @@
 package com.tonybeltramelli.desktop.core.classifier.multiclass
 
 import scala.collection.mutable.{Map => MutMap}
+import com.tonybeltramelli.desktop.util.UMath
+import scala.collection.mutable.ListBuffer
 
 trait AClassifier
 {
@@ -45,6 +47,13 @@ trait AClassifier
   {
     //to override
     Set("")
+  }
+  
+  protected def _getNormalizedAndPrunedResults(res: MutMap[String, Double], threshold: Double, cut: Int) =
+  {
+    val result = res.toSeq.sortWith(_._2 > _._2)
+    
+    result.map(f => f._1 -> UMath.normalize(0, 1, f._2, result.last._2, result.head._2)).filter(_._2 >= threshold).take(cut).map(_._1).toSet
   }
 	
   protected def _getTermFreq(doc: List[String]) =

@@ -36,20 +36,4 @@ object Helper {
     println(message)
     _i += 1
   }
-	
-  def log2(x: Double) = Math.log10(x) / Math.log10(2.0)
-  
-  def flipDimensions(original: Iterable[(String, List[(Int, Double)])]): Map[Int, Iterable[(String, Double)]] =
-  {
-    val flatten = for {
-      (s, v) <- original
-      (i, d) <- v
-    } yield (i, s, d)
-	
-    implicit class RichTuple2[A, B, C](t: (A, B, C)) {
-      def tail: (B, C) = (t._2, t._3)
-    }
-	
-    flatten.groupBy(_._1).mapValues(_.map(_.tail))
-  }
 }

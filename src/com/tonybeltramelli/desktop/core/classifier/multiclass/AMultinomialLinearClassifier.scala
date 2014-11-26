@@ -10,13 +10,20 @@ trait AMultinomialLinearClassifier extends AClassifier
   private val _THRESHOLD = 0.5
   
   protected def _train(topic: String, bc: ABinaryLinearClassifier)
-  {
+  {/*
     for(docIndex <- _getRandomDocuments(topic).par)
     {
       val doc = _documents(docIndex)
       val isRelated = doc._3.contains(topic)
       
       bc.train(doc._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
+    }*/
+    
+    for(doc <- _documents.par)
+    {
+      val isRelated = doc._2._3.contains(topic)
+      
+      bc.train(doc._2._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
     }
    
     _classifiers += topic -> bc
@@ -26,9 +33,9 @@ trait AMultinomialLinearClassifier extends AClassifier
   {
     val documentFeatures = tokens.map(f => f -> _inverseFreq.getOrElse(f, 0.0)).filter(_._2 > 0.0).toMap
     
-    val results = _classifiers.map(bc => (bc._1, bc._2.getProb(documentFeatures))).filter(_._2 >= _THRESHOLD).toSeq.sortWith(_._2 > _._2)
+    val results = _classifiers.map(bc => bc._1 -> bc._2.getProb(documentFeatures))
     
-    results.map(_._1).toSet
+    _getNormalizedAndPrunedResults(results, 0.5, 2)
   }
   
   private def _getRandomDocuments(trueTopic: String) =
