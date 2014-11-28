@@ -3,27 +3,20 @@ package com.tonybeltramelli.desktop.core.classifier.multiclass
 import scala.collection.mutable.{Map => MutMap}
 import scala.util.Random
 import com.tonybeltramelli.desktop.core.classifier.binary.ABinaryLinearClassifier
+import com.tonybeltramelli.desktop.util.Helper
 
 trait AMultinomialLinearClassifier extends AClassifier
 {
   private val _classifiers: MutMap[String, ABinaryLinearClassifier] = MutMap() //class name -> binary classifier
-  private val _THRESHOLD = 0.5
   
   protected def _train(topic: String, bc: ABinaryLinearClassifier)
-  {/*
+  {
     for(docIndex <- _getRandomDocuments(topic).par)
     {
       val doc = _documents(docIndex)
       val isRelated = doc._3.contains(topic)
       
       bc.train(doc._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
-    }*/
-    
-    for(doc <- _documents.par)
-    {
-      val isRelated = doc._2._3.contains(topic)
-      
-      bc.train(doc._2._1.map(f => f._1 -> _inverseFreq(f._1)), isRelated)
     }
    
     _classifiers += topic -> bc
@@ -52,6 +45,6 @@ trait AMultinomialLinearClassifier extends AClassifier
       i -= 1
     }
     
-    documents
+    random.shuffle(documents)
   }
 }

@@ -3,6 +3,7 @@ package com.tonybeltramelli.desktop.core.classifier.multiclass
 import scala.collection.mutable.{Map => MutMap}
 import com.tonybeltramelli.desktop.util.UMath
 import scala.collection.mutable.ListBuffer
+import com.tonybeltramelli.desktop.util.Helper
 
 trait AClassifier
 {
