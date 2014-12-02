@@ -18,12 +18,10 @@ class SupportVectorMachinesBinary extends ABinaryLinearClassifier
     
     if(margin <= 0)
     {
-      _theta ++= thetaShrink
+      thetaShrink
     }else{
       val projection = (1.0 / Math.sqrt(lambda * _step)) * direction
-      _theta ++= _combine(_scalarMultiplication(documentFeatures, projection), theta ++ thetaShrink)
+      _combine(_scalarMultiplication(documentFeatures, projection), theta ++ thetaShrink)
     }
-    
-    Map()
   }
 }
