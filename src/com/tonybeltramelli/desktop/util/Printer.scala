@@ -40,8 +40,8 @@ class Printer(path: String, classifierNumber: Int)
   {
     var c = ""
     classifierNumber match {
-      case 1 => c = "lr"
-      case 2 => c = "nb"
+      case 1 => c = "nb"
+      case 2 => c = "lr"
       case 3 => c = "svm"
     }
 

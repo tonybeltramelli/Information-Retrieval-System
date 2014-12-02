@@ -2,11 +2,11 @@ package com.tonybeltramelli.desktop.core.classifier.binary
 
 trait ABinaryLinearClassifier
 {
-  protected var _theta: Map[String, Double] = Map()
+  private var _theta: Map[String, Double] = Map()
 
   def train(documentFeatures: Map[String, Double], isRelated: Boolean)
   {
-    _theta = _theta ++ _gradient(_theta, documentFeatures, isRelated)
+    _theta ++= _gradient(_theta, documentFeatures, isRelated)
   }
 
   def getProb(documentFeatures: Map[String, Double]) = _sigmoid(_theta, documentFeatures)

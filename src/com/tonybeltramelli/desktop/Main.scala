@@ -20,8 +20,8 @@ object Main
     {
       println("Usage: \n")
       println(" <root path> <classifier> <document number>\n")
-      println(" <root path> : String, path to the data folder\n")
-      println(" <classifier> : Int, 1 => Logistic Regression / 2 => Naive Bayes / 3 => Support Vector Machines\n")
+      println(" <root path> : String, path to the root folder\n")
+      println(" <classifier> : Int, 1 => Naive Bayes / 2 => Logistic Regression / 3 => Support Vector Machines\n")
       println(" <document number> : Int, number of document to process, -1 for all\n")
       	
       System.exit(1)
@@ -46,8 +46,8 @@ class Main
     
     classifierNumber match
     {
-      case 1 => _classifier = new LogisticRegression
-      case 2 => _classifier = new NaiveBayes
+      case 1 => _classifier = new NaiveBayes
+      case 2 => _classifier = new LogisticRegression
       case 3 => _classifier = new SupportVectorMachines
     }
     
@@ -91,7 +91,7 @@ class Main
     
     val relevance = _relevance.assess(retrieved, expected)
     
-    //println(_parser.doc.name + " : " + relevance._1 + " " + relevance._2 + " " + relevance._3)
+    Helper.debug(_parser.doc.name + " : " + relevance._1 + " " + relevance._2 + " " + relevance._3)
     
     val results = _parser.doc.name + " " + retrieved.mkString(" ") + "\n"
     _printer.print(results, true)

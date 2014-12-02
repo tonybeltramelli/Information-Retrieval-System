@@ -28,7 +28,7 @@ trait AMultinomialLinearClassifier extends AClassifier
     
     val results = _classifiers.map(bc => bc._1 -> bc._2.getProb(documentFeatures))
     
-    _getNormalizedAndPrunedResults(results, 0.5, 2)
+    _getNormalizedAndPrunedResults(results, 0.6, 3)
   }
   
   private def _getRandomDocuments(trueTopic: String) =
