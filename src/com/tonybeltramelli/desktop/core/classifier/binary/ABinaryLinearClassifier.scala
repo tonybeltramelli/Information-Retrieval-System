@@ -2,7 +2,7 @@ package com.tonybeltramelli.desktop.core.classifier.binary
 
 trait ABinaryLinearClassifier
 {
-  protected var _theta: Map[String, Double] = Map()
+  private var _theta: Map[String, Double] = Map()
 
   def train(documentFeatures: Map[String, Double], isRelated: Boolean)
   {
