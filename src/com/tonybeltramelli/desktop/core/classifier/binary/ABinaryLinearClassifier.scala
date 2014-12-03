@@ -2,7 +2,7 @@ package com.tonybeltramelli.desktop.core.classifier.binary
 
 trait ABinaryLinearClassifier
 {
-  private var _theta: Map[String, Double] = Map()
+  protected var _theta: Map[String, Double] = Map()
 
   def train(documentFeatures: Map[String, Double], isRelated: Boolean)
   {
@@ -34,13 +34,6 @@ trait ABinaryLinearClassifier
 
   protected def _combine(vector1: Map[String, Double], vector2: Map[String, Double]) =
   {
-    var result: Map[String, Double] = Map()
-    
-    for(key <- (vector1.keySet))
-    {
-      result = result + (key -> (vector2.getOrElse(key, 0.0) + vector1(key)))
-    }
-    
-    result
+    vector1.map(v => v._1 -> (vector2.getOrElse(v._1, 0.0) + v._2))
   }
 }
