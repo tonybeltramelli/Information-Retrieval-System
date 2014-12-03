@@ -21,7 +21,6 @@ class SupportVectorMachinesBinary extends ABinaryLinearClassifier
       thetaShrink
     }else{
       val projection = (1.0 / Math.sqrt(lambda * _step)) * direction
-      
       _combine(_scalarMultiplication(documentFeatures, projection), thetaShrink)
     }
   }
