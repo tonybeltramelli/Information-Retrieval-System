@@ -4,7 +4,12 @@ Information-Retrieval-System
 
 Student project Autumn 2014 - [ETH Zurich](http://www.ethz.ch/en)
 
-#Search Engine
+The project contain two main parts respectively detailed in this file:
+* Query engine
+* Document classifier
+
+#Query Engine
+---
 
 ##Usage
 
@@ -90,6 +95,7 @@ com.github.aztek.porterstemmer.PorterStemmer.scala
 ```
 
 #Document Classifier
+---
 
 Document classifiers implemented :
 
