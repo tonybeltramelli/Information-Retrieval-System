@@ -8,8 +8,8 @@ The project contain two main parts respectively detailed in this file:
 * Query engine
 * Document classifier
 
-#Query Engine
 ---
+#Query Engine
 
 ##Usage
 
@@ -94,8 +94,8 @@ Stemmer class :
 com.github.aztek.porterstemmer.PorterStemmer.scala
 ```
 
-#Document Classifier
 ---
+#Document Classifier
 
 Document classifiers implemented :
 
