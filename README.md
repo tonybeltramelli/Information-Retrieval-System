@@ -4,7 +4,7 @@ Information-Retrieval-System
 
 Student project Autumn 2014 - [ETH Zurich](http://www.ethz.ch/en)
 
-The project contain two main parts respectively detailed in this file:
+The project consists of two main parts detailed respectively in this file:
 * Query engine
 * Document classifier
 
